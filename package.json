@@ -1,0 +1,12 @@
+{
+  "name": "time-parser",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "antlr4": "4.9"
+  },
+  "scripts": {
+    "start:dev": "cross-env NODE_ENV=production NODE_CONFIG_ENV=dev node -r tsconfig-paths/register dist/main.js"
+  }
+}

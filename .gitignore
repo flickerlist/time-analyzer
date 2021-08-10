@@ -1,0 +1,8 @@
+.antlr
+dist
+node_modules
+
+lib/grammar/*
+!lib/grammar/*.g4
+
+yarn-error.log
