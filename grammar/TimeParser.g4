@@ -13,9 +13,9 @@ statementList
     ;
 
 statement
-    : zh
+    : std
+    | zh
     | en
-    | std
     ;
 
 //// std
@@ -65,12 +65,12 @@ enDate
     ;
 
 enDateNormal
-    : enMonthDay (Dot YearNumber)?
+    : enMonthDay (Comma YearNumber)?
     ;
 
 enDateAround
     // e.g.: April 5, next year
-    : enMonthDay Dot? EnAroundWord EnYearWord                             # EnDateYearAroundAlias
+    : enMonthDay Comma? EnAroundWord EnYearWord                             # EnDateYearAroundAlias
     // e.g.: next year on April 5th
     | EnAroundWord EnYearWord EnOf enMonthDay                             # EnDateYearAroundAlias_2
     // 5th of next month
@@ -87,21 +87,21 @@ enDateAround
     | EnWeekValue EnOf EnAroundWord EnWeekWord                            # EnDateWeekAroundAlias_2
 
     // e.g.: April 5, 3 years later
-    | enMonthDay Dot? stepValue EnYearWord enAroundMark                   # EnDateYearAroundStep
+    | enMonthDay Comma? stepValue EnYearWord enAroundMark                   # EnDateYearAroundStep
     // e.g.: April 5 after 3 years
-    | enMonthDay Dot? enAroundMark stepValue EnYearWord                   # EnDateYearAroundStep_2
+    | enMonthDay Comma? enAroundMark stepValue EnYearWord                   # EnDateYearAroundStep_2
     // e.g.: 5th 3 months later
-    | enDay Dot? stepValue EnMonthValue enAroundMark                      # EnDateMonthAroundStep
+    | enDay Comma? stepValue EnMonthValue enAroundMark                      # EnDateMonthAroundStep
     // e.g.: 5th after 3 months
-    | enDay Dot? enAroundMark stepValue EnMonthValue                      # EnDateMonthAroundStep
+    | enDay Comma? enAroundMark stepValue EnMonthValue                      # EnDateMonthAroundStep
     // e.g.: 3 days later
     | stepValue EnDayWord enAroundMark                                    # EnDateDayAroundStep
     // e.g.: after 3 days
     | enAroundMark stepValue EnDayWord                                    # EnDateDayAroundStep_2
     // e.g.: friday, 3 weeks later
-    | EnWeekValue Dot? stepValue EnWeekWord enAroundMark                  # EnDateWeekAroundStep
+    | EnWeekValue Comma? stepValue EnWeekWord enAroundMark                  # EnDateWeekAroundStep
     // e.g.: friday, after 3 weeks
-    | EnWeekValue Dot? enAroundMark stepValue EnWeekWord                  # EnDateWeekAroundStep_2
+    | EnWeekValue Comma? enAroundMark stepValue EnWeekWord                  # EnDateWeekAroundStep_2
     ;
 
 enMonthDay
@@ -263,7 +263,7 @@ stdUselessWords
     | SlashConnectorWord
     | TimeConnectorWord
     | DateTimeConnectorWord
-    | Dot
+    | Comma
     ;
 
 enUselessWords
