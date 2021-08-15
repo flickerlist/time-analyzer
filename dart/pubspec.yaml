@@ -1,4 +1,4 @@
-name: time_analyze
+name: time_analyzer
 
 environment:
   sdk: ">=2.10.0 <3.0.0"

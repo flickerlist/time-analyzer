@@ -1,4 +1,5 @@
-# Time Parser
+# Time analyzerr
+> analyzer, extract the time text from any string, and convert it to standard time.
 
 ## Support
 ### Standard
