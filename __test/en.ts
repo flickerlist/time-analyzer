@@ -4,6 +4,7 @@ const date_normal = [
   ...standard.date,
   '[MonthName] 3, 2002',
   '[MonthName] 3',
+  'March 10, 2010 at 10 o\'clock in the evening'
 ];
 
 const One = [
@@ -18,9 +19,11 @@ const Number = [
 
 // 英文日期别名
 const date_alias = [
+  'the day before yesterday',
   'yesterday',
   'today',
   'tomorrow',
+  'the day after tomorrow',
   '[One] day before',
   '[One] day ago',
   '[One] day later',

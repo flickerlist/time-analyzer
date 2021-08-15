@@ -3,7 +3,6 @@ import * as standard from './standard';
 
 // 中文标准日期
 export const date_normal = [
-  ...standard.date,
   '2021年9月10号',
   '2021年9月10日',
   '9月10号',
