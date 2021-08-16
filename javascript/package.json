@@ -3,10 +3,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "dependencies": {
-    "antlr4": "4.9"
-  },
   "scripts": {
-    "start:dev": "cross-env NODE_ENV=production NODE_CONFIG_ENV=dev node -r tsconfig-paths/register dist/main.js"
+    "test:temp": "tsc && node dist/__test/std.js",
+    "gen-parser": "antlr4ts -visitor lib/grammar/TimeLexer.g4 && antlr4ts -visitor lib/grammar/TimeParser.g4",
+    "pregen-parser": "yarn clean-parser && mkdir -p lib/grammar && cp -r ../grammar/*.g4 lib/grammar/",
+    "clean-parser": "rm -rf lib/grammar/*.interp lib/grammar/*.tokens lib/grammar/*.js lib/grammar/*.tokens lib/grammar/*.ts"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "antlr4": "~4.9.2",
+    "antlr4ts": "~0.5.0-alpha.4"
+  },
+  "devDependencies": {
+    "antlr4ts-cli": "~0.5.0-alpha.4"
   }
 }

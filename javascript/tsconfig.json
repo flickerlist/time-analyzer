@@ -1,10 +1,11 @@
 {
+  "allowSyntheticDefaultImports": false,
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2019",
+    "target": "es2015",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -19,5 +20,5 @@
       "@/*": ["src/*"]
     }
   },
-  "exclude": ["node_modules", "__test", "dist"]
+  "exclude": ["node_modules", "dist"]
 }
