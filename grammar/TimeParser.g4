@@ -13,16 +13,32 @@ statementList
     ;
 
 statement
-    : std
-    | zh
-    | en
+    : zhAt? zhPeriodDateTime
+    | enAt? enPeriodDateTime
+    | enAt? stdPeriodDateTime
+
+    | zhAt? zhDateTime
+    | enAt? enDateTime
+    | enAt? stdDateTime
+
+    | zhAt? zhDate
+    | enAt? enDate
+    | enAt? stdDate
+
+    | zhAt? zhTime
+    | enAt? enTime
+    | enAt? stdTime
+
+    | zhAt? zhDirectTimeAround
+    | enAt? enDirectTimeAround
     ;
 
 //// std
-std
-    : stdDateTime
-    | stdDate
-    | stdTime
+stdPeriodDateTime
+    : stdDate stdPeriodTo stdDate             # StdPeriodDateToDate
+    | stdDateTime stdPeriodTo stdDateTime     # StdPeriodDateTimeToDateTime
+    | stdDateTime stdPeriodTo stdTime         # StdPeriodDateTimeToTime
+    | stdTime stdPeriodTo stdTime             # StdPeriodTimeToTime
     ;
 
 stdDateTime
@@ -47,17 +63,22 @@ stdDateTimeConnector
     : DateTimeConnectorWord?
     ;
 
+stdPeriodTo
+    : MiddelConnectorWord
+    | MiddelConnectorCurve
+    ;
+
 //// en
-en
-    : EnOf? enDateTime
-    | EnOf? enDate
-    | EnOf? enTime
-    | EnOf? enDirectTimeAround
+enPeriodDateTime
+    : enDate enPeriodTo enDate             # EnPeriodDateToDate
+    | enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToTime
+    | enDateTime enPeriodTo enTime         # EnPeriodDateTimeToTime
+    | enTime enPeriodTo enTime             # EnPeriodTimeToTime
     ;
 
 enDateTime
     : enDate enTime
-    | enTime EnOf? enDate;
+    | enTime enAt? enDate;
 
 enDate
     : enDateNormal
@@ -70,43 +91,43 @@ enDateNormal
 
 enDateAround
     // e.g.: April 5, next year
-    : enMonthDay Comma? EnAroundWord EnYearWord                             # EnDateYearAroundAlias
+    : enMonthDay Comma? EnAroundWord EnYearWord                  # EnDateYearAroundAlias
     // e.g.: next year on April 5th
-    | EnAroundWord EnYearWord EnOf enMonthDay                             # EnDateYearAroundAlias_2
+    | EnAroundWord EnYearWord enAt enMonthDay                    # EnDateYearAroundAlias_2
     // 5th of next month
-    | enDay EnOf EnAroundWord EnMonthWord                                 # EnDateMonthAroundAlias
+    | enDay enAt EnAroundWord EnMonthWord                        # EnDateMonthAroundAlias
     // e.g.: next April on the 5th
-    | EnAroundWord EnMonthWord EnOf enDay                                 # EnDateMonthAroundAlias_2
+    | EnAroundWord EnMonthWord enAt enDay                        # EnDateMonthAroundAlias_2
     // e.g.: next day
-    | EnAroundWord EnDayWord                                              # EnDateDayAroundAlias
+    | EnAroundWord EnDayWord                                     # EnDateDayAroundAlias
     // e.g.: tomorrow
-    | EnAroundDayWord                                                     # EnDateDayAroundAlias_2
+    | EnAroundDayWord                                            # EnDateDayAroundAlias_2
     // e.g.: next friday
-    | EnAroundWord? EnWeekValue                                           # EnDateWeekAroundAlias
+    | EnAroundWord? EnWeekValue                                  # EnDateWeekAroundAlias
     // e.g.: friday of next week
-    | EnWeekValue EnOf EnAroundWord EnWeekWord                            # EnDateWeekAroundAlias_2
+    | EnWeekValue enAt EnAroundWord EnWeekWord                   # EnDateWeekAroundAlias_2
 
     // e.g.: April 5, 3 years later
-    | enMonthDay Comma? stepValue EnYearWord enAroundMark                   # EnDateYearAroundStep
+    | enMonthDay Comma? stepValue EnYearWord enAroundMark        # EnDateYearAroundStep
     // e.g.: April 5 after 3 years
-    | enMonthDay Comma? enAroundMark stepValue EnYearWord                   # EnDateYearAroundStep_2
+    | enMonthDay Comma? enAroundMark stepValue EnYearWord        # EnDateYearAroundStep_2
     // e.g.: 5th 3 months later
-    | enDay Comma? stepValue EnMonthValue enAroundMark                      # EnDateMonthAroundStep
+    | enDay Comma? stepValue EnMonthValue enAroundMark           # EnDateMonthAroundStep
     // e.g.: 5th after 3 months
-    | enDay Comma? enAroundMark stepValue EnMonthValue                      # EnDateMonthAroundStep
+    | enDay Comma? enAroundMark stepValue EnMonthValue           # EnDateMonthAroundStep
     // e.g.: 3 days later
-    | stepValue EnDayWord enAroundMark                                    # EnDateDayAroundStep
+    | stepValue EnDayWord enAroundMark                           # EnDateDayAroundStep
     // e.g.: after 3 days
-    | enAroundMark stepValue EnDayWord                                    # EnDateDayAroundStep_2
+    | enAroundMark stepValue EnDayWord                           # EnDateDayAroundStep_2
     // e.g.: friday, 3 weeks later
-    | EnWeekValue Comma? stepValue EnWeekWord enAroundMark                  # EnDateWeekAroundStep
+    | EnWeekValue Comma? stepValue EnWeekWord enAroundMark       # EnDateWeekAroundStep
     // e.g.: friday, after 3 weeks
-    | EnWeekValue Comma? enAroundMark stepValue EnWeekWord                  # EnDateWeekAroundStep_2
+    | EnWeekValue Comma? enAroundMark stepValue EnWeekWord       # EnDateWeekAroundStep_2
     ;
 
 enMonthDay
     : EnMonthValue enDay
-    | enDay EnOf EnMonthValue
+    | enDay enAt EnMonthValue
     ;
 
 enDay
@@ -121,9 +142,9 @@ enTime
 
 enDirectTimeAround
     // e.g.: after 3 hours and 30 minutes
-    : enAroundMark stepValue EnHourWord (EnAnd stepValue EnMinuteWord)?         # EnTimeHourStep
+    : enAroundMark stepValue EnHourWord (EnAndWord stepValue EnMinuteWord)?         # EnTimeHourStep
     // e.g.: 3 hours and 30 minutes later
-    | stepValue EnHourWord (EnAnd stepValue EnMinuteWord)? enAroundMark         # EnTimeHourStep_2
+    | stepValue EnHourWord (EnAndWord stepValue EnMinuteWord)? enAroundMark         # EnTimeHourStep_2
     // e.g.: after 30 minutes
     | enAroundMark stepValue EnMinuteWord                                       # EnTimeMinuteStep
     // e.g.: 30 minutes later
@@ -135,12 +156,21 @@ enAroundMark
     | EnAfterWord
     ;
 
+enPeriodTo
+    : EnToWord
+    | stdPeriodTo
+    ;
+
+enAt
+    : EnAtWord
+    ;
+
 //// zh
-zh
-    : zhDateTime
-    | zhDate
-    | zhTime
-    | zhDirectTimeAround
+zhPeriodDateTime
+    : zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
+    | zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToTime
+    | zhDateTime zhPeriodTo zhTime         # ZhPeriodDateTimeToTime
+    | zhTime zhPeriodTo zhTime             # ZhPeriodTimeToTime
     ;
 
 zhDateTime
@@ -160,11 +190,11 @@ zhDateAround
     : zhAroundAliasMark ZhYearWord zhDateMonthDay                         # ZhDateYearAroundAlias
     | zhAroundAliasMark ZhCountMonth zhDateDay                            # ZhDateMonthAroundAlias
     | zhAroundAliasMark (ZhTian | ZhDayWord)                              # ZhDateDayAroundAlias
-    | zhAroundAliasMark? (ZhWeekWord ZhOf)? ZhWeekWord (stepValue | ZhDayWord)                 # ZhDateWeekAroundAlias
-    | stepValue ZhYearWord zhAroundStepMark zhDateMonthDay                  # ZhDateYearAroundStep
-    | stepValue ZhCountMonth zhAroundStepMark zhDateDay                     # ZhDateMonthAroundStep
-    | stepValue (ZhTian | ZhDayWord) zhAroundStepMark                       # ZhDateDayAroundStep
-    | stepValue ZhWeekWord zhAroundStepMark ZhOf? ZhWeekWord zhWeekDayValue       # ZhDateWeekAroundStep
+    | zhAroundAliasMark? (ZhWeekWord ZhOf)? ZhWeekWord zhWeekDayValue     # ZhDateWeekAroundAlias
+    | stepValue ZhYearWord zhAroundStepMark zhDateMonthDay                # ZhDateYearAroundStep
+    | stepValue ZhCountMonth zhAroundStepMark zhDateDay                   # ZhDateMonthAroundStep
+    | stepValue (ZhTian | ZhDayWord) zhAroundStepMark                     # ZhDateDayAroundStep
+    | stepValue ZhWeekWord zhAroundStepMark ZhOf? ZhWeekWord zhWeekDayValue   # ZhDateWeekAroundStep
     ;
 
 zhDateMonthDay
@@ -238,6 +268,15 @@ zhAroundStepMark
     | ZhAfterWord
     ;
 
+zhPeriodTo
+    : ZhToWord
+    | stdPeriodTo
+    ;
+
+zhAt
+    : ZhAtWord
+    ;
+
 // common
 yearValue
     : YearNumber
@@ -284,8 +323,9 @@ enUselessWords
     | EnMorningWord
     | EnAfternoonWord
     | EnHourWholeWord
-    | EnOf
-    | EnAnd
+    | EnAtWord
+    | EnAndWord
+    | EnToWord
     ;
 
 zhUselessWords

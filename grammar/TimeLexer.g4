@@ -71,13 +71,17 @@ EnHourWholeWord
     | O '\\' C L O C K
     ;
 
-EnOf
+EnAtWord
     : O N ' ' T H E
     | A T ' ' T H E
     | O N
     | A T
-    | O F;
-EnAnd                 : A N D;
+    | O F
+    | W H E N
+    | W H I L E
+    ;
+EnAndWord             : A N D;
+EnToWord              : T O;
 
 //// zh (cn && tw && hk)
 ZhValueWord           : ('一' | '二' | '三' | '四' | '五' | '六' | '七' | '八' | '九' | '十' | '廿')+;
@@ -104,12 +108,16 @@ ZhCountSecond         : '秒钟' | '秒鐘';
 ZhMorningWord         : '凌晨' | '上午' | '中午' | '淩晨'; // Useless
 ZhAfternoonWord       : '下午' | '晚上';
 
+ZhToWord              : '至' | '到';
+ZhAtWord              : '于' | '在';
+
 //// common
 YearNumber            : [1-9][0-9][0-9][0-9];
 DateNumber            : [0-9]?[0-9];
 NormaNumber           : [1-9][0-9]*;
 
 MiddelConnectorWord   : '-';
+MiddelConnectorCurve  : '~';
 SlashConnectorWord    : '/';
 TimeConnectorWord     : ':';
 DateTimeConnectorWord : 'T';

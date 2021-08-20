@@ -1,7 +1,7 @@
 import { CharStreams, CommonTokenStream} from 'antlr4ts';
 
 import { TimeLexer } from './grammar/TimeLexer';
-import { ProgramContext, TimeParser } from './grammar/TimeParser';
+import { TimeParser } from './grammar/TimeParser';
 import { AnalyzerValue } from './model';
 import { TimeAnalyzerVisitor } from './visitor';
 

@@ -1,11 +1,11 @@
-import { Interval } from "antlr4ts/misc/Interval";
-import { objectToString } from "./utils/convert";
+import { ParserRuleContext } from "antlr4ts";
 
 export enum AnalyzerValueType {
-  DateTime,
-  Date,
-  Time,
-  ResultArray,
+  PeriodDateTime = 'PeriodDateTime',
+  DateTime = 'DateTime',
+  Date = 'Date',
+  Time = 'Time',
+  ValueArray = 'ValueArray',
 }
 
 export class SourceMapPosition {
@@ -17,8 +17,8 @@ export class SourceMapPosition {
     this.end = end;
   }
 
-  static fromInterval(antlrInterval: Interval) {
-    return new SourceMapPosition(antlrInterval.a, antlrInterval.b)
+  static fromParserRuleContext(ctx: ParserRuleContext) {
+    return new SourceMapPosition(ctx.start.startIndex, ctx.stop.stopIndex);
   }
 }
 
@@ -57,11 +57,26 @@ export abstract class AnalyzerValue {
       return pre;
     }, []);
   }
-
-  toString(): string {
-    return objectToString(this);
-  }
 }
+
+export class AnalyzerPeriodDateTimeValue extends AnalyzerValue {
+  constructor(
+    start: AnalyzerValue,
+    end: AnalyzerValue,
+    options: AnalyzerValueOptions,
+  ) {
+    super({
+      valueType:  AnalyzerValueType.PeriodDateTime,
+      mapPosition: options.mapPosition,
+    });
+    this.start = start;
+    this.end = end;
+  }
+
+  start: AnalyzerValue = null;
+  end: AnalyzerValue = null;
+}
+
 
 export class AnalyzerDateValue extends AnalyzerValue {
   constructor(
@@ -155,39 +170,14 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
 }
 
 export class AnalyzerValueArray extends AnalyzerValue {
-  constructor(values: AnalyzerValue[] = []) {
+  constructor(
+    values: AnalyzerValue[] = [],
+  ) {
     super({
-      valueType:  AnalyzerValueType.ResultArray,
+      valueType:  AnalyzerValueType.ValueArray,
     });
     this.values = values;
-    this.mapPositions = AnalyzerValue.concatCharMapping(values);
   }
 
   values: AnalyzerValue[];
-
-  toString() {
-    const strValues = [];
-    for(const value of this.values) {
-      strValues.push(objectToString(this), ['values'])
-    }
-    return JSON.stringify(strValues)
-  }
 }
-
-// export class AnalyzerDateTime implements AnalyzerValue {
-//   dateTime: Date;
-//   hasTime: boolean;
-//   charMapping: number[][]; // date text mapping from origin text
-
-//   constructor(dateTime: Date, {
-//     hasTime = true,
-//     charMapping = [],
-//   }: {
-//     hasTime: boolean;
-//     charMapping: number[][];
-//   }){
-//     this.dateTime = dateTime;
-//     this.hasTime = hasTime;
-//     this.charMapping = charMapping;
-//   };
-// }

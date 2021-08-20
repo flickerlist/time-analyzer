@@ -1,9 +1,8 @@
-import { ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhDateYearAroundAliasContext, ZhDateMonthAroundAliasContext, ZhDateDayAroundAliasContext, ZhDateWeekAroundAliasContext, ZhDateYearAroundStepContext, ZhDateMonthAroundStepContext, ZhDateDayAroundStepContext, ZhDateWeekAroundStepContext, ZhContext, ZhDateTimeContext, ZhDateContext, ZhDateNormalContext, ZhDateAroundContext, ZhDateMonthDayContext, ZhDateDayContext, ZhWeekDayValueContext, ZhMonthDayMarkContext, ZhAroundAliasMarkContext, ZhTimeContext, ZhTimeNormalContext, ZhTimePeriodAliasMarkContext, ZhHourMarkContext, ZhMinuteMarkContext, ZhSecondMarkContext, ZhDirectTimeAroundContext, ZhDateValueContext, ZhAroundStepMarkContext, ZhUselessWordsContext } from "../grammar/TimeParser";
+import { ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhDateYearAroundAliasContext, ZhDateMonthAroundAliasContext, ZhDateDayAroundAliasContext, ZhDateWeekAroundAliasContext, ZhDateYearAroundStepContext, ZhDateMonthAroundStepContext, ZhDateDayAroundStepContext, ZhDateWeekAroundStepContext, ZhDateTimeContext, ZhDateContext, ZhDateNormalContext, ZhDateAroundContext, ZhDateMonthDayContext, ZhDateDayContext, ZhWeekDayValueContext, ZhMonthDayMarkContext, ZhAroundAliasMarkContext, ZhTimeContext, ZhTimeNormalContext, ZhTimePeriodAliasMarkContext, ZhHourMarkContext, ZhMinuteMarkContext, ZhSecondMarkContext, ZhDirectTimeAroundContext, ZhDateValueContext, ZhAroundStepMarkContext, ZhUselessWordsContext } from "../grammar/TimeParser";
 import { AnalyzerValue } from "../model";
 import { StdTimeAnalyzerVisitor } from "./std";
 
 export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
-  visitZh?: (ctx: ZhContext) => AnalyzerValue;
   visitZhDateTime?: (ctx: ZhDateTimeContext) => AnalyzerValue;
   visitZhDate?: (ctx: ZhDateContext) => AnalyzerValue;
   visitZhDateNormal?: (ctx: ZhDateNormalContext) => AnalyzerValue;
