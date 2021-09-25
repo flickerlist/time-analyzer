@@ -11,7 +11,7 @@ EnMonthValue
     | M A Y '.' | M A Y
     | J U N E | J U N '.'
     | J U L Y | J U L '.'
-    | A U G U S T | A U G' .'
+    | A U G U S T | A U G '.'
     | S E P T E M B E R | S E P '.'
     | O C T O B E R | O C T '.'
     | N O V E M B E R | N O V '.'

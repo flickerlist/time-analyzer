@@ -6,7 +6,7 @@
   "scripts": {
     "test:temp": "tsc && node dist/__test/std.js",
     "gen-parser": "antlr4ts -visitor lib/grammar/TimeLexer.g4 && antlr4ts -visitor lib/grammar/TimeParser.g4",
-    "pregen-parser": "yarn clean-parser && mkdir -p lib/grammar && cp -r ../grammar/*.g4 lib/grammar/",
+    "pregen-parser": "yarn clean-parser",
     "clean-parser": "rm -rf lib/grammar/*.interp lib/grammar/*.tokens lib/grammar/*.js lib/grammar/*.tokens lib/grammar/*.ts"
   },
   "engines": {

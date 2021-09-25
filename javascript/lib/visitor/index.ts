@@ -12,6 +12,9 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
     const statements = ctx.statement();
     for (const item of statements) {
       const value = this.visit(item);
+      if (!value) {
+        continue;
+      }
       value.mapPosition = SourceMapPosition.fromParserRuleContext(ctx);
       values.push(value);
     }

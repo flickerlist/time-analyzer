@@ -1,5 +1,7 @@
 import { ParserRuleContext } from "antlr4ts";
 
+export type AroundType = -1 | 1 | 0;
+
 export enum AnalyzerValueType {
   PeriodDateTime = 'PeriodDateTime',
   DateTime = 'DateTime',
@@ -157,6 +159,18 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
           timeValue,
         ]),
       }
+    );
+  }
+
+  static fromDateTime(dateTime: Date, options: AnalyzerValueOptions) {
+    return new AnalyzerDateTimeValue(
+      dateTime.getFullYear(),
+      dateTime.getMonth(),
+      dateTime.getDate(),
+      dateTime.getHours(),
+      dateTime.getMinutes(),
+      dateTime.getSeconds(),
+      options,
     );
   }
 
