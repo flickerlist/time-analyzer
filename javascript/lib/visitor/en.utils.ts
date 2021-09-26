@@ -12,7 +12,7 @@ export function parseEnStepAliasMark(mark: EnStepAliasMarkContext): AroundType {
 }
 
 // parse enDay context
-export function parseEnDay(ctx: EnDayContext) {
+export function parseEnDay(ctx: EnDayContext): 0 | number {
   if (ctx.DateNumber()) {
     return parseToInt(ctx.DateNumber().text, 0);
   }
@@ -21,7 +21,7 @@ export function parseEnDay(ctx: EnDayContext) {
 }
 
 // parse EnMonthValue token
-export function parseEnMonthValue(ctx: TerminalNode): number {
+export function parseEnMonthValue(ctx: TerminalNode): -1 | number {
   const text = ctx.text.toUpperCase();
   switch(text) {
     case 'JANUARY':
@@ -42,7 +42,7 @@ export function parseEnMonthValue(ctx: TerminalNode): number {
     case 'JUNE':
     case 'JUN.':
       return 5;
-    case 'JUL Y':
+    case 'JULY':
     case 'JUL.':
       return 6;
     case 'AUGUST':
@@ -64,9 +64,41 @@ export function parseEnMonthValue(ctx: TerminalNode): number {
       return -1;
   }
 }
+// parse EnWeekValue token
+export function parseEnWeekValue(ctx: TerminalNode): -1 | number {
+  const text = ctx.text.toUpperCase();
+  switch(text) {
+    case 'MONDAY':
+    case 'MON.':
+      return 1;
+    case 'TUESDAY':
+    case 'TUES.':
+      return 2;
+    case 'WEDNESDAY':
+    case 'WED.':
+      return 3;
+    case 'THURSDAY':
+    case 'THUR.':
+      return 4;
+    case 'FRIDAY':
+    case 'FRI.':
+      return 5;
+    case 'SATURDAY':
+    case 'SAT.':
+      return 6;
+    case 'SUNDAY':
+    case 'SUN.':
+      return 0;
+    default:
+      return -1;
+  }
+}
 
 // parse EnAroundWord
-export function parseEnAroundWord(ctx: TerminalNode): AroundType {
+export function parseEnAroundWord(ctx: TerminalNode | null): AroundType {
+  if (!ctx) {
+    return 0;
+  }
   switch (ctx.text.toUpperCase()) {
     case 'OF THE FOLLOWING':
     case 'NEXT':
@@ -79,7 +111,7 @@ export function parseEnAroundWord(ctx: TerminalNode): AroundType {
   }
 }
 
-
+// parse EnAroundDay
 export function parseEnAroundDayWord(ctx: TerminalNode): number {
   switch(ctx.text.toUpperCase()) {
     case 'THE DAY BEFORE YESTERDAY':

@@ -1,4 +1,4 @@
-import { AroundType } from "lib/model";
+import { AroundType } from "../model";
 import { StepValueContext, YearValueContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
 

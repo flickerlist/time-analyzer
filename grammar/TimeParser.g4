@@ -71,7 +71,7 @@ stdPeriodTo
 //// en
 enPeriodDateTime
     : enDate enPeriodTo enDate             # EnPeriodDateToDate
-    | enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToTime
+    | enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
     | enDateTime enPeriodTo enTime         # EnPeriodDateTimeToTime
     | enTime enPeriodTo enTime             # EnPeriodTimeToTime
     ;
@@ -118,7 +118,7 @@ enDateAround
     // e.g.: 5th 3 months later
     | enDay Comma? stepValue EnMonthValue enStepAliasMark           # EnDateMonthAroundStep
     // e.g.: 5th after 3 months
-    | enDay Comma? enStepAliasMark stepValue EnMonthValue           # EnDateMonthAroundStep
+    | enDay Comma? enStepAliasMark stepValue EnMonthValue           # EnDateMonthAroundStep_2
     // e.g.: 3 days later
     | stepValue EnDayWord enStepAliasMark                           # EnDateDayAroundStep
     // e.g.: after 3 days
@@ -140,8 +140,8 @@ enDay
     ;
 
 enTime
-    : stdTime (EnAfternoonWord | EnMorningWord)?
-    | DateNumber EnHourWholeWord
+    : stdTime (EnAfternoonWord | EnMorningWord)?                                   # EnTimeNormal
+    | DateNumber EnHourWholeWord  (EnAfternoonWord | EnMorningWord)?               # EnTimeOClock
     ;
 
 enDirectTimeAround

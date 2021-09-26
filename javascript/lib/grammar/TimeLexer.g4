@@ -1,1 +1,1 @@
-../../lib/grammar/TimeLexer.g4
+../../../grammar/TimeLexer.g4

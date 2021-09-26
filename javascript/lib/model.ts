@@ -1,4 +1,5 @@
 import { ParserRuleContext } from "antlr4ts";
+import { StdDateTimeContext } from "./grammar/TimeParser";
 
 export type AroundType = -1 | 1 | 0;
 
@@ -10,54 +11,53 @@ export enum AnalyzerValueType {
   ValueArray = 'ValueArray',
 }
 
-export class SourceMapPosition {
-  start: number;
-  end: number;
+// match data of text
+export class MatchData {
+  startIndex: number = -1;
+  endIndex: number = -1;
+  
+  // set after visit over, for context'text property of antlr4 will skip 'WS', 'NEWLINE' (those should skip while parse)
+  text: string = null;
 
-  constructor(start: number, end: number) {
-    this.start = start;
-    this.end = end;
-  }
-
-  static fromParserRuleContext(ctx: ParserRuleContext) {
-    return new SourceMapPosition(ctx.start.startIndex, ctx.stop.stopIndex);
+  constructor(context?: ParserRuleContext) {
+    if (context) {
+      this.startIndex = context.start.startIndex;
+      this.endIndex = context.stop.stopIndex + 1;
+    }
   }
 }
 
-export interface AnalyzerValueOptions {
-  mapPosition?: SourceMapPosition;
-  mapPositions?: SourceMapPosition[];
+interface AnalyzerValueOptions {
+  context?: ParserRuleContext;
 }
 
 
 export abstract class AnalyzerValue {
   valueType: AnalyzerValueType;
-  mapPosition?: SourceMapPosition;
-  mapPositions?: SourceMapPosition[]; // date text mapping from origin text
+  match: MatchData;
 
   constructor({
     valueType,
-    mapPosition = null,
-    mapPositions = [],
+    context = null,
     }: {
       valueType: AnalyzerValueType;
-      mapPosition?: SourceMapPosition;
-      mapPositions?: SourceMapPosition[];
+      context?: ParserRuleContext;
     }) {
     this.valueType = valueType;
-    this.mapPosition = mapPosition;
-    this.mapPositions = mapPositions;
+    this.match = new MatchData(context);
   }
 
-  static concatCharMapping(values: AnalyzerValue[]): SourceMapPosition[] {
-    return values.reduce<SourceMapPosition[]>((pre, current) => {
-      if (current.mapPositions.length) {
-        pre.concat(current.mapPositions);
-      } else if (current.mapPosition) {
-        pre.push(current.mapPosition);
-      }
-      return pre;
-    }, []);
+  resetContext(context?: ParserRuleContext) {
+    this.match = new MatchData(context);
+  }
+
+  resetMatchText(input: string = '') {
+    if (this.match.startIndex >= 0 && this.match.endIndex>=0) {
+      this.match.text = input.substring(
+        this.match.startIndex,
+        this.match.endIndex,
+      );
+    }
   }
 }
 
@@ -69,7 +69,7 @@ export class AnalyzerPeriodDateTimeValue extends AnalyzerValue {
   ) {
     super({
       valueType:  AnalyzerValueType.PeriodDateTime,
-      mapPosition: options.mapPosition,
+      context: options.context,
     });
     this.start = start;
     this.end = end;
@@ -89,7 +89,7 @@ export class AnalyzerDateValue extends AnalyzerValue {
   ) {
     super({
       valueType:  AnalyzerValueType.Date,
-      mapPosition: options.mapPosition,
+      context: options.context,
     });
     this.year = year;
     this.month = month;
@@ -99,6 +99,19 @@ export class AnalyzerDateValue extends AnalyzerValue {
   year: number = 0;
   month: number = 0;
   day: number = 0;
+
+  static fromDateTime(
+    dateTime: Date,
+    context?: ParserRuleContext,
+  ) {
+    return new AnalyzerDateValue(
+      dateTime.getFullYear(),
+      dateTime.getMonth(),
+      dateTime.getDate(), {
+        context,
+      },
+    );
+  }
 }
 
 
@@ -111,7 +124,7 @@ export class AnalyzerTimeValue extends AnalyzerValue {
   ) {
     super({
       valueType:  AnalyzerValueType.Time,
-      mapPosition: options.mapPosition,
+      context: options.context,
     });
     this.hour = hour;
     this.minute = minute;
@@ -122,6 +135,19 @@ export class AnalyzerTimeValue extends AnalyzerValue {
   hour: number = 0;
   minute: number = 0;
   second: number = 0;
+
+  static fromDateTime(
+    dateTime: Date,
+    context?: ParserRuleContext,
+  ) {
+    return new AnalyzerTimeValue(
+      dateTime.getHours(),
+      dateTime.getMinutes(),
+      dateTime.getSeconds(), {
+        context,
+      }
+    );
+  }
 }
 
 export class AnalyzerDateTimeValue extends AnalyzerValue {
@@ -136,7 +162,7 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
   ) {
     super({
       valueType: AnalyzerValueType.Time,
-      mapPosition: options.mapPosition,
+      context: options.context,
     });
     this.year = year;
     this.month = month;
@@ -146,7 +172,11 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
     this.second = second;
   }
 
-  static create(dateValue: AnalyzerDateValue, timeValue: AnalyzerTimeValue) {
+  static create(
+    dateValue: AnalyzerDateValue,
+    timeValue: AnalyzerTimeValue,
+    context?: ParserRuleContext,
+  ) {
     return new AnalyzerDateTimeValue(
       dateValue.year,
       dateValue.month,
@@ -154,23 +184,24 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
       timeValue.hour,
       timeValue.minute,
       timeValue.second, {
-        mapPositions: AnalyzerValue.concatCharMapping([
-          dateValue,
-          timeValue,
-        ]),
+        context: context,
       }
     );
   }
 
-  static fromDateTime(dateTime: Date, options: AnalyzerValueOptions) {
+  static fromDateTime(
+    dateTime: Date,
+    context?: ParserRuleContext,
+  ) {
     return new AnalyzerDateTimeValue(
       dateTime.getFullYear(),
       dateTime.getMonth(),
       dateTime.getDate(),
       dateTime.getHours(),
       dateTime.getMinutes(),
-      dateTime.getSeconds(),
-      options,
+      dateTime.getSeconds(), {
+        context,
+      }
     );
   }
 
@@ -183,6 +214,7 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
   second: number = 0;
 }
 
+// only use for visit result combined
 export class AnalyzerValueArray extends AnalyzerValue {
   constructor(
     values: AnalyzerValue[] = [],

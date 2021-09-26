@@ -1,5 +1,5 @@
 import { ProgramContext, StatementListContext, StatementContext } from "../grammar/TimeParser";
-import { AnalyzerValue, AnalyzerValueArray, SourceMapPosition } from "../model";
+import { AnalyzerValue, AnalyzerValueArray } from "../model";
 import { EnTimeAnalyzerVisitor } from "./en";
 
 export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
@@ -15,7 +15,7 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
       if (!value) {
         continue;
       }
-      value.mapPosition = SourceMapPosition.fromParserRuleContext(ctx);
+      value.resetContext(ctx);
       values.push(value);
     }
     return new AnalyzerValueArray(values);
