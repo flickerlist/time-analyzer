@@ -1,7 +1,7 @@
-import { AnalyzerValueType } from '../lib/model';
-import TimeAnalyzer from '../lib/index';
+import { AnalyzerValueType } from '../../lib/model';
+import TimeAnalyzer from '../../lib/index';
 
-describe('Standard', () => {
+describe('Standard Normal', () => {
   
   test('Date', () => {
     const values = new TimeAnalyzer('2022-09-10').values;
@@ -9,7 +9,7 @@ describe('Standard', () => {
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,
       year: 2022,
-      month: 9,
+      month: 8,
       day: 10,
       match: {
         startIndex: 0,
@@ -25,7 +25,7 @@ describe('Standard', () => {
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,
       year: 2022,
-      month: 7,
+      month: 6,
       day: 1,
       match: {
         startIndex: 0,
@@ -41,7 +41,7 @@ describe('Standard', () => {
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.DateTime,
       year: 2022,
-      month: 7,
+      month: 6,
       day: 1,
       match: {
         startIndex: 0,
@@ -57,7 +57,7 @@ describe('Standard', () => {
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.DateTime,
       year: 2022,
-      month: 7,
+      month: 6,
       day: 1,
       hour: 15,
       minute: 30,
@@ -65,6 +65,24 @@ describe('Standard', () => {
         startIndex: 0,
         endIndex: 16,
         text: '2022-07-01 15:30',
+      },
+    });
+  });
+  
+  test('Oral', () => {
+    const values = new TimeAnalyzer('Call me at 2022-07-01 15:30, remember.').values;
+    expect(values).toHaveLength(1);
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.DateTime,
+      year: 2022,
+      month: 6,
+      day: 1,
+      hour: 15,
+      minute: 30,
+      match: {
+        startIndex: 8,
+        endIndex: 27,
+        text: 'at 2022-07-01 15:30',
       },
     });
   });

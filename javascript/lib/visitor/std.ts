@@ -3,6 +3,7 @@ import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeVa
 import { BasicTimeAnalyzerVisitor } from "./basic";
 import { parsePeriodDateTimeToTime } from "./basic.utils";
 import { getCurrentYear, parseYearValue } from "./std.utils";
+import { parseToInt, parseToMonthValue } from "../utils/convert";
 
 export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
 
@@ -49,9 +50,15 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
 
   visitStdDate = (ctx: StdDateContext): AnalyzerValue => {
-    const year = ctx.yearValue() ? parseYearValue(ctx.yearValue()) : getCurrentYear();
-    const month = parseInt(ctx.DateNumber()[0].text);
-    const day = parseInt(ctx.DateNumber()[1].text);
+    const year = ctx.yearValue()
+      ? parseYearValue(ctx.yearValue())
+      : getCurrentYear();
+    const month = parseToMonthValue(ctx.DateNumber()[0].text);
+    const day = parseToInt(ctx.DateNumber()[1].text);
+
+    if (month < 0) {
+      return null;
+    }
 
     return new AnalyzerDateValue(year, month, day, {
       context: ctx,
@@ -60,9 +67,9 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
   
   visitStdTime = (ctx: StdTimeContext): AnalyzerValue => {
-    const hour = parseInt(ctx.DateNumber()[0].text);
-    const minute = parseInt(ctx.DateNumber()[1].text);
-    const second = ctx.DateNumber()[2]? parseInt(ctx.DateNumber()[2].text) : 0;
+    const hour = parseToInt(ctx.DateNumber()[0].text);
+    const minute = parseToInt(ctx.DateNumber()[1].text);
+    const second = ctx.DateNumber()[2]? parseToInt(ctx.DateNumber()[2].text) : 0;
     
     return new AnalyzerTimeValue(hour, minute, second, {
       context: ctx,

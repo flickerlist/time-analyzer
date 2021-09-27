@@ -1,6 +1,6 @@
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { AnalyzerDateValue, AnalyzerPeriodDateTimeValue } from './../model';
-import { EnTimeHourStepContext, EnTimeHourStep_2Context, EnTimeMinuteStepContext, EnTimeMinuteStep_2Context, EnDateYearAroundAliasContext, EnDateYearAroundAlias_2Context, EnDateMonthAroundAliasContext, EnDateMonthAroundAlias_2Context, EnDateMonthAroundAlias_3Context, EnDateMonthAroundAlias_4Context, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateWeekAroundAlias_2Context, EnDateYearAroundStepContext, EnDateYearAroundStep_2Context, EnDateMonthAroundStepContext, EnDateDayAroundStepContext, EnDateDayAroundStep_2Context, EnDateWeekAroundStepContext, EnDateWeekAroundStep_2Context, EnMonthDayContext, EnDayContext, StepValueContext, EnStepAliasMarkContext, EnPeriodTimeToTimeContext, EnPeriodDateTimeToTimeContext, EnPeriodDateTimeToDateTimeContext, EnPeriodDateToDateContext, EnTimeContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext } from "../grammar/TimeParser";
+import { EnTimeHourStepContext, EnTimeHourStep_2Context, EnTimeMinuteStepContext, EnTimeMinuteStep_2Context, EnDateYearAroundAliasContext, EnDateYearAroundAlias_2Context, EnDateMonthAroundAliasContext, EnDateMonthAroundAlias_2Context, EnDateMonthAroundAlias_3Context, EnDateMonthAroundAlias_4Context, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateWeekAroundAlias_2Context, EnDateYearAroundStepContext, EnDateYearAroundStep_2Context, EnDateMonthAroundStepContext, EnDateDayAroundStepContext, EnDateDayAroundStep_2Context, EnDateWeekAroundStepContext, EnDateWeekAroundStep_2Context, EnMonthDayContext, EnDayContext, StepValueContext, EnStepAliasMarkContext, EnPeriodTimeToTimeContext, EnPeriodDateTimeToTimeContext, EnPeriodDateTimeToDateTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from "../model";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue } from "./en.utils";
 import { computedAroundTime, getCurrentYear, parseStepValue, parseYearValue } from "./std.utils";
@@ -59,7 +59,9 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     if (!value) {
       return null;
     }
-    const year = parseToInt(ctx.YearNumber().text);
+    const year = ctx.YearNumber()
+      ? parseToInt(ctx.YearNumber().text)
+      : getCurrentYear();
     if (year) {
       value.year = year;
     }

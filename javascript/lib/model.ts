@@ -1,6 +1,6 @@
 import { ParserRuleContext } from "antlr4ts";
-import { StdDateTimeContext } from "./grammar/TimeParser";
 
+// parse result for: before, after, ago, '前', '后' ...
 export type AroundType = -1 | 1 | 0;
 
 export enum AnalyzerValueType {
@@ -31,7 +31,9 @@ interface AnalyzerValueOptions {
   context?: ParserRuleContext;
 }
 
-
+// remove useless match (at header or suffix)
+const uselessPrefixReg = /^[-~/:,]+/g;
+const uselessSuffixReg = /[-~/:,]+$/g;
 export abstract class AnalyzerValue {
   valueType: AnalyzerValueType;
   match: MatchData;
@@ -52,11 +54,26 @@ export abstract class AnalyzerValue {
   }
 
   resetMatchText(input: string = '') {
-    if (this.match.startIndex >= 0 && this.match.endIndex>=0) {
-      this.match.text = input.substring(
+    let text = '';
+    if (this.match.startIndex >= 0
+      && this.match.endIndex>=0) {
+      text = input.substring(
         this.match.startIndex,
         this.match.endIndex,
       );
+      // remove useless match at header
+      if (uselessPrefixReg.test(text)) {
+        const newText = text.replace(uselessPrefixReg, '');
+        this.match.startIndex += text.length - newText.length;
+        text = newText;
+      }
+      // remove useless match at suffix
+      if (uselessSuffixReg.test(text)) {
+        const newText = text.replace(uselessSuffixReg, '');
+        this.match.endIndex -= text.length - newText.length;
+        text = newText;
+      }
+      this.match.text = text;
     }
   }
 }

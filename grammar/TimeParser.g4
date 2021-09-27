@@ -131,7 +131,7 @@ enDateAround
 
 enMonthDay
     : EnMonthValue enDay
-    | enDay enAt EnMonthValue
+    | enDay enAt? EnMonthValue
     ;
 
 enDay
