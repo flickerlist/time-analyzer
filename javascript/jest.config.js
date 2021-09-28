@@ -10,7 +10,7 @@ module.exports = {
     '^.+\\.(t|j)s$': 'ts-jest'
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/../src/$1'
+    '^@/lib/(.*)$': '<rootDir>/../lib/$1'
   },
   coverageDirectory: null,
   testEnvironment: 'node',

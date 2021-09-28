@@ -1,6 +1,6 @@
-import { parseWeekDay_startAtSunday } from '../../lib/visitor/common.utils';
-import { getCurrentYear } from '../../lib/visitor/std.utils';
-import { TimeAnalyzer, AnalyzerValueType, AroundType } from '../../lib/index';
+import { parseWeekDay_startAtSunday } from '@/lib/visitor/common.utils';
+import { getCurrentYear } from '@/lib/visitor/std.utils';
+import { TimeAnalyzer, AnalyzerValueType, AroundType } from '@/lib/index';
 
 describe('En Normal', () => {
 

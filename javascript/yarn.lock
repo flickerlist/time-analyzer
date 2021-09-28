@@ -2384,6 +2384,11 @@ ts-jest@^27.0.5:
     semver "7.x"
     yargs-parser "20.x"
 
+ts-transform-paths@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/ts-transform-paths/-/ts-transform-paths-2.0.3.tgz#8d9cc0e7b503e36c9fe44b5019c2cd59950c43de"
+  integrity sha512-eMUcIe/CCLUl90j9xqyj0RXC0t7h2E/ETbGBG3E8xFLyIMD9kTixUfZM78K1sHu0OBTFZTo6J7aUOafB8Mx+Dg==
+
 type-check@~0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"

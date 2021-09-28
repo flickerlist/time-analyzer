@@ -17,8 +17,9 @@
       }
     ],
     "paths": {
-      "@/*": ["src/*"]
+      "@/lib/*": ["lib/*"]
     }
   },
+  "include": ["lib", "__test"],
   "exclude": ["node_modules", "dist"]
 }

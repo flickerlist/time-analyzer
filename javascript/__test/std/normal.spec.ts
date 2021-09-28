@@ -1,4 +1,4 @@
-import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from '../../lib/index';
+import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from '@/lib/index';
 
 describe('Standard Normal', () => {
   
