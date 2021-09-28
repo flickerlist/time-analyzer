@@ -5,7 +5,9 @@ import { TimeParser } from './grammar/TimeParser';
 import { AnalyzerValue, AnalyzerValueArray } from './model';
 import { TimeAnalyzerVisitor } from './visitor';
 
-export default class TimeAnalyzer {
+export * from './model';
+
+export class TimeAnalyzer {
   parser: TimeParser;
   visitor: TimeAnalyzerVisitor;
 
@@ -16,6 +18,9 @@ export default class TimeAnalyzer {
     const lexer = new TimeLexer(chars);
     const tokens = new CommonTokenStream(lexer);
     this.parser = new TimeParser(tokens);
+
+    // hide error while parsing, for tokens before target statement will throw error.
+    this.parser.removeErrorListeners();
 
     this.visitor = new TimeAnalyzerVisitor();
     

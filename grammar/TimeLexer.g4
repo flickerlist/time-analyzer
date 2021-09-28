@@ -45,9 +45,7 @@ EnAfterWord
     : A F T E R
     | L A T E R;
 
-EnYearWord            
-    : Y E A R S
-    | Y E A R;
+EnYearWord            : Y E A R S?;
 EnMonthWord           : M O N T H S?;
 EnDayWord             : D A Y S?;
 EnWeekWord            : W E E K S?;

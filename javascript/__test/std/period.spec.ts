@@ -1,5 +1,4 @@
-import { AnalyzerValueType } from '../../lib/model';
-import TimeAnalyzer from '../../lib/index';
+import { TimeAnalyzer, AnalyzerValueType } from '../../lib/index';
 
 describe('Standard Period', () => {
   

@@ -99,9 +99,9 @@ enDateAround
     // e.g.: next month on the 5th
     | EnAroundWord EnMonthWord enAt enDay                           # EnDateMonthAroundAlias_2
     // e.g.: 5th of next April
-    | enDay enAt EnAroundWord EnMonthValue                          # EnDateMonthAroundAlias_3
+    | enDay enAt? Comma? EnAroundWord EnMonthValue                  # EnDateMonthAroundAlias_3
     // e.g.: next April on the 5th
-    | EnAroundWord EnMonthValue enAt enDay                          # EnDateMonthAroundAlias_4
+    | EnAroundWord EnMonthValue enAt? Comma? enDay                  # EnDateMonthAroundAlias_4
     // e.g.: next day
     | EnAroundWord EnDayWord                                        # EnDateDayAroundAlias
     // e.g.: tomorrow
@@ -109,16 +109,20 @@ enDateAround
     // e.g.: next friday
     | EnAroundWord? EnWeekValue                                     # EnDateWeekAroundAlias
     // e.g.: friday of next week
-    | EnWeekValue enAt EnAroundWord EnWeekWord                      # EnDateWeekAroundAlias_2
+    | EnWeekValue enAt? Comma? EnAroundWord EnWeekWord              # EnDateWeekAroundAlias_2
 
     // e.g.: April 5, 3 years later
     | enMonthDay Comma? stepValue EnYearWord enStepAliasMark        # EnDateYearAroundStep
     // e.g.: April 5 after 3 years
     | enMonthDay Comma? enStepAliasMark stepValue EnYearWord        # EnDateYearAroundStep_2
+    // e.g.: 3 years later on April 5
+    | stepValue EnYearWord enStepAliasMark Comma? enAt? enMonthDay  # EnDateYearAroundStep_3
+    // e.g.: after 3 years, on April 5
+    | enStepAliasMark stepValue EnYearWord Comma? enAt? enMonthDay  # EnDateYearAroundStep_4
     // e.g.: 5th 3 months later
-    | enDay Comma? stepValue EnMonthValue enStepAliasMark           # EnDateMonthAroundStep
+    | enDay Comma? stepValue EnMonthWord enStepAliasMark            # EnDateMonthAroundStep
     // e.g.: 5th after 3 months
-    | enDay Comma? enStepAliasMark stepValue EnMonthValue           # EnDateMonthAroundStep_2
+    | enDay Comma? enStepAliasMark stepValue EnMonthWord            # EnDateMonthAroundStep_2
     // e.g.: 3 days later
     | stepValue EnDayWord enStepAliasMark                           # EnDateDayAroundStep
     // e.g.: after 3 days

@@ -3,10 +3,10 @@ import { AnalyzerDateValue, AnalyzerPeriodDateTimeValue } from './../model';
 import { EnTimeHourStepContext, EnTimeHourStep_2Context, EnTimeMinuteStepContext, EnTimeMinuteStep_2Context, EnDateYearAroundAliasContext, EnDateYearAroundAlias_2Context, EnDateMonthAroundAliasContext, EnDateMonthAroundAlias_2Context, EnDateMonthAroundAlias_3Context, EnDateMonthAroundAlias_4Context, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateWeekAroundAlias_2Context, EnDateYearAroundStepContext, EnDateYearAroundStep_2Context, EnDateMonthAroundStepContext, EnDateDayAroundStepContext, EnDateDayAroundStep_2Context, EnDateWeekAroundStepContext, EnDateWeekAroundStep_2Context, EnMonthDayContext, EnDayContext, StepValueContext, EnStepAliasMarkContext, EnPeriodTimeToTimeContext, EnPeriodDateTimeToTimeContext, EnPeriodDateTimeToDateTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from "../model";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue } from "./en.utils";
-import { computedAroundTime, getCurrentYear, parseStepValue, parseYearValue } from "./std.utils";
+import { computedAroundTime, getCurrentYear, parseStepValue } from "./std.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
 import { ParserRuleContext } from 'antlr4ts';
-import { parsePeriodDateTimeToTime } from './basic.utils';
+import { parsePeriodDateTimeToTime, parseWeekDay_startAtSunday } from './common.utils';
 import { parseToInt } from '../utils/convert';
 
 export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
@@ -266,8 +266,8 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     }
     const now = new Date();
     now.setHours(0, 0, 0, 0);
-    const split = weekValue - now.getDay();
-    now.setDate(7 * roundType + split);
+    const split = weekValue - parseWeekDay_startAtSunday(now.getDay());
+    now.setDate(now.getDate() + 7 * roundType + split);
     return new AnalyzerDateValue(
       now.getFullYear(),
       now.getMonth(),
@@ -284,6 +284,12 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   visitEnDateYearAroundStep_2(ctx: EnDateYearAroundStep_2Context): AnalyzerValue {
     return this.parseEnDateYearAroundStep(ctx.enMonthDay(), ctx.stepValue(), ctx.enStepAliasMark(), ctx);
   };
+  visitEnDateYearAroundStep_3(ctx: EnDateYearAroundStep_2Context): AnalyzerValue {
+    return this.parseEnDateYearAroundStep(ctx.enMonthDay(), ctx.stepValue(), ctx.enStepAliasMark(), ctx);
+  };
+  visitEnDateYearAroundStep_4(ctx: EnDateYearAroundStep_2Context): AnalyzerValue {
+    return this.parseEnDateYearAroundStep(ctx.enMonthDay(), ctx.stepValue(), ctx.enStepAliasMark(), ctx);
+  };
   private parseEnDateYearAroundStep(
     enMonthDay: EnMonthDayContext,
     stepValue: StepValueContext,
@@ -291,7 +297,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     ctx: ParserRuleContext,
   ): AnalyzerDateValue {
     const date = this.visit(enMonthDay) as AnalyzerDateValue;
-    date.year = parseStepValue(stepValue) * parseEnStepAliasMark(enStepAliasMarkContext);
+    date.year = getCurrentYear() + parseStepValue(stepValue) * parseEnStepAliasMark(enStepAliasMarkContext);
     return date;
   }
 
@@ -352,7 +358,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   ): AnalyzerDateValue {
     const now = new Date();
     const weekValue = parseEnWeekValue(enWeekValue);
-    now.setDate(now.getDate() + now.getDay() - weekValue);
+    now.setDate(now.getDate() + parseWeekDay_startAtSunday(now.getDay()) - weekValue);
     now.setDate(now.getDate() + parseStepValue(stepValue) * 7);
     return AnalyzerDateValue.fromDateTime(now, ctx);
   }

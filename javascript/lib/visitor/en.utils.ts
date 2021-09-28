@@ -1,3 +1,4 @@
+import { parseWeekDay_startAtSunday } from './common.utils';
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { EnDayContext, EnStepAliasMarkContext } from "../grammar/TimeParser";
 import { AroundType } from "../model";
@@ -67,31 +68,41 @@ export function parseEnMonthValue(ctx: TerminalNode): -1 | number {
 // parse EnWeekValue token
 export function parseEnWeekValue(ctx: TerminalNode): -1 | number {
   const text = ctx.text.toUpperCase();
+  let value = -1;
   switch(text) {
     case 'MONDAY':
     case 'MON.':
-      return 1;
+      value = 1;
+      break;
     case 'TUESDAY':
     case 'TUES.':
-      return 2;
+      value =  2;
+      break;
     case 'WEDNESDAY':
     case 'WED.':
-      return 3;
+      value =  3;
+      break;
     case 'THURSDAY':
     case 'THUR.':
-      return 4;
+      value =  4;
+      break;
     case 'FRIDAY':
     case 'FRI.':
-      return 5;
+      value =  5;
+      break;
     case 'SATURDAY':
     case 'SAT.':
-      return 6;
+      value =  6;
+      break;
     case 'SUNDAY':
     case 'SUN.':
-      return 0;
+      value =  0;
+      break;
     default:
-      return -1;
+      value =  -1;
+      break;
   }
+  return parseWeekDay_startAtSunday(value);
 }
 
 // parse EnAroundWord
@@ -118,7 +129,7 @@ export function parseEnAroundDayWord(ctx: TerminalNode): number {
       return -2;
     case 'YESTERDAY':
       return -1;
-    case 'T O M O R R O W':
+    case 'TOMORROW':
       return 1;
     case 'THE DAY AFTER TOMORROW':
       return 2;

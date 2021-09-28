@@ -1,10 +1,9 @@
-import { AnalyzerValueType } from '../../lib/model';
-import TimeAnalyzer from '../../lib/index';
+import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from '../../lib/index';
 
 describe('Standard Normal', () => {
   
   test('Date', () => {
-    const values = new TimeAnalyzer('2022-09-10').values;
+    const values: AnalyzerValue[] = new TimeAnalyzer('2022-09-10').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,

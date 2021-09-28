@@ -1,7 +1,7 @@
 import { StdDateTimeContext, StdDateContext, StdTimeContext, StdPeriodDateToDateContext, StdPeriodDateTimeToTimeContext, StdPeriodDateTimeToDateTimeContext, StdPeriodTimeToTimeContext } from "../grammar/TimeParser";
 import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodDateTimeValue } from "../model";
 import { BasicTimeAnalyzerVisitor } from "./basic";
-import { parsePeriodDateTimeToTime } from "./basic.utils";
+import { parsePeriodDateTimeToTime } from "./common.utils";
 import { getCurrentYear, parseYearValue } from "./std.utils";
 import { parseToInt, parseToMonthValue } from "../utils/convert";
 

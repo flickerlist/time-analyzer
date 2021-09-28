@@ -15,7 +15,7 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
       if (!value) {
         continue;
       }
-      value.resetContext(ctx);
+      value.resetContext(item);
       values.push(value);
     }
     return new AnalyzerValueArray(values);
