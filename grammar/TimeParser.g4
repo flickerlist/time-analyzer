@@ -13,24 +13,24 @@ statementList
     ;
 
 statement
-    : zhAt? zhPeriodDateTime
-    | enAt? enPeriodDateTime
+    : enAt? enPeriodDateTime
+    | zhAt? zhPeriodDateTime
     | enAt? stdPeriodDateTime
 
-    | zhAt? zhDateTime
     | enAt? enDateTime
+    | zhAt? zhDateTime
     | enAt? stdDateTime
 
-    | zhAt? zhDate
     | enAt? enDate
+    | zhAt? zhDate
     | enAt? stdDate
 
-    | zhAt? zhTime
     | enAt? enTime
+    | zhAt? zhTime
     | enAt? stdTime
 
-    | zhAt? zhDirectTimeAround
     | enAt? enDirectTimeAround
+    | zhAt? zhDirectTimeAround
     ;
 
 //// std
@@ -77,8 +77,9 @@ enPeriodDateTime
     ;
 
 enDateTime
-    : enDate enTime
-    | enTime enAt? enDate;
+    : enDate Comma? enAt? enTime
+    | enTime Comma? enAt? enDate (EnAfternoonWord | EnMorningWord)?
+    ;
 
 enDate
     : enDateAround
@@ -151,7 +152,10 @@ enDay
 
 enTime
     : stdTime (EnAfternoonWord | EnMorningWord)?                                   # EnTimeNormal
-    | DateNumber EnHourWholeWord  (EnAfternoonWord | EnMorningWord)?               # EnTimeOClock
+    | (
+        (DateNumber EnHourWholeWord (EnAfternoonWord | EnMorningWord)?)
+        | (DateNumber (EnAfternoonWord | EnMorningWord))
+      )  # EnTimeOClock
     ;
 
 enDirectTimeAround

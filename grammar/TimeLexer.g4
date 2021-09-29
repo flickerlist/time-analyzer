@@ -53,16 +53,17 @@ EnHourWord            : H O U R S?;
 EnMinuteWord          : M I N U T E S?;
 EnSecondWord          : S E C O N D S?;
 
+
 EnMorningWord         
     : A '.' M '.'? | A M
-    | (I N ' ' T H E ' ')? M O R N I N G
-    | (A T ' ')? N O O N
+    | EnAtWord? M O R N I N G
+    | EnAtWord? N O O N
     ;
 EnAfternoonWord       
     : P '.' M '.'? | P M
-    | (I N ' ' T H E ' ')? A F T E R N O O N
-    | (I N ' ' T H E ' ')? E V E N I N G
-    | (A T ' ')? N I G H T
+    | EnAtWord? A F T E R N O O N
+    | EnAtWord? E V E N I N G
+    | EnAtWord? N I G H T
     ;
 EnHourWholeWord
     : O F ' ' C L O C K
@@ -70,14 +71,12 @@ EnHourWholeWord
     ;
 
 EnAtWord
-    : O N ' ' T H E
-    | A T ' ' T H E
-    | O N
-    | A T
+    : ((I N) | (O N) | (A T)) ' ' (T H E ' ')?
     | O F
     | W H E N
     | W H I L E
     ;
+
 EnAndWord             : A N D;
 EnToWord              : T O;
 

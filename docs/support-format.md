@@ -63,14 +63,16 @@
 
 ### Time
 - 1pm
+- at 5:30 p.m
 - at 4 o’clock
-- at 4
+- at 8 at night
+- at 3:30:30 in the afternoon
+- 12:30 at noon
 
 ### DateTime
 - March 3, 2020, 3 p.m.
-- 6:00 PM on Wednesday evening on Sep. 10th, 2020
 - 6:00 PM on May 20, 2020
-- on Saturday , September 10th, at 5:50 p.m.
+- on September 10th, at 5:50 p.m.
 - at 5:50 on Saturday afternoon
 
 ### Period

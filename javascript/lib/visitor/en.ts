@@ -45,10 +45,16 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enDateTime
 	visitEnDateTime(ctx: EnDateTimeContext): AnalyzerValue {
-    return AnalyzerDateTimeValue.create(
+    const value = AnalyzerDateTimeValue.create(
       this.visit(ctx.enDate()) as AnalyzerDateValue, 
       this.visit(ctx.enTime()) as AnalyzerTimeValue,
     );
+    if (ctx.EnAfternoonWord()) {
+      if(value.hour < 12) {
+        value.hour += 12;
+      }
+    }
+    return value;
   };
 
   //// enDateNormal
