@@ -19,9 +19,6 @@ export class TimeAnalyzer {
     const tokens = new CommonTokenStream(lexer);
     this.parser = new TimeParser(tokens);
 
-    // hide error while parsing, for tokens before target statement will throw error.
-    this.parser.removeErrorListeners();
-
     this.visitor = new TimeAnalyzerVisitor();
     
     this.value = this.visitor.visit(this.parser.program()) as AnalyzerValueArray;
