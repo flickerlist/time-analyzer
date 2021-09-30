@@ -79,6 +79,7 @@ EnAtWord
 
 EnAndWord             : A N D;
 EnToWord              : T O;
+EnFrom                : F R O M;
 
 //// zh (cn && tw && hk)
 ZhValueWord           : ('一' | '二' | '三' | '四' | '五' | '六' | '七' | '八' | '九' | '十' | '廿')+;
@@ -111,7 +112,7 @@ ZhAtWord              : '于' | '在';
 //// common
 YearNumber            : [1-9][0-9][0-9][0-9];
 DateNumber            : [0-9]?[0-9];
-NormaNumber           : [1-9][0-9]*;
+NormalNumber           : [1-9][0-9]*;
 
 MiddelConnectorWord   : '-';
 MiddelConnectorCurve  : '~';

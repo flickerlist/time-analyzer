@@ -1,6 +1,7 @@
+import { StepOffsetType } from '@/lib/model';
 import { parseWeekDay_startAtSunday } from '@/lib/visitor/common.utils';
 import { getCurrentYear } from '@/lib/visitor/std.utils';
-import { TimeAnalyzer, AnalyzerValueType, AroundType } from '@/lib/index';
+import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
 
 describe('En Date', () => {
 
@@ -135,9 +136,9 @@ describe('En Date', () => {
     const targetWeekDay = parseWeekDay_startAtSunday(5);
     const date = new Date();
     const weekDaysLength = 7;
-    const aroundType: AroundType = 1;
+    const offsetType: StepOffsetType = 1;
     date.setDate(date.getDate()
-      + weekDaysLength * aroundType 
+      + weekDaysLength * offsetType 
       + targetWeekDay - parseWeekDay_startAtSunday(date.getDay()));
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,

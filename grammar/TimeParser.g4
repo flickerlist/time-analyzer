@@ -70,10 +70,23 @@ stdPeriodTo
 
 //// en
 enPeriodDateTime
-    : enDate enPeriodTo enDate             # EnPeriodDateToDate
-    | enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
-    | enDateTime enPeriodTo enTime         # EnPeriodDateTimeToTime
-    | enTime enPeriodTo enTime             # EnPeriodTimeToTime
+    : EnFrom? enDate enPeriodTo enDate             # EnPeriodDateToDate
+    | EnFrom? enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
+    | EnFrom? enDateTime enPeriodTo enTime         # EnPeriodDateTimeToTime
+    | EnFrom? enTime enPeriodTo enTime             # EnPeriodTimeToTime
+    // e.g.: March 3rd-5th, 2002 | March 3-5, 2002 | March 3rd to 5th, 2002 | 3rd to 5th of next month | next month, on the 3-5
+    | EnFrom? (
+        (enMonth enDay enPeriodTo enDay)
+        | (enDay enPeriodTo enDay Comma? enAt? enMonth)
+     ) Comma? enAt? enYear?  # EnPeriodMonthDayToMonthDay
+    | enPeriodWeek                                 # EnPeriodWeekDayNode 
+    ;
+
+enPeriodWeek
+    // e.g.: Next Mon.-Fri. | From this Mon. to next Fri. | From Mon.-Fri. of next week
+    : (EnFrom? (EnAroundWord? EnWeekValue enPeriodTo EnAroundWord? EnWeekValue) | (EnWeekValue enPeriodTo EnWeekValue Comma? enAt? EnAroundWord EnWeekValue))  # EnPeriodWeek_1
+    // e.g.: Mon.-Fri., after 3 weeks | after 3 weeks, from Mon.-Fri.
+    | ((EnFrom? EnWeekValue enPeriodTo EnWeekValue Comma? enAt? enStepAliasMark stepValue EnWeekWord) | (enStepAliasMark stepValue EnWeekWord Comma? enAt? EnWeekValue enPeriodTo EnWeekValue))  # EnPeriodWeek_2
     ;
 
 enDateTime
@@ -87,52 +100,29 @@ enDate
     ;
 
 enDateNormal
-    : enMonthDay (Comma YearNumber)?
+    : enMonthDay Comma? enAt? enYear?
+    | enYear Comma? enAt? enMonthDay
+    | enWeekDay
     ;
 
 enDateAround
-    // e.g.: April 5, next year | next year on April 5th
-    : (
-        (enMonthDay Comma? EnAroundWord EnYearWord)
-        | (EnAroundWord EnYearWord enAt enMonthDay)
-      )   # EnDateYearAroundAlias
-    // e.g.: 5th of next month | next month on the 5th
-    | (
-        (enDay enAt EnAroundWord EnMonthWord)
-        | (EnAroundWord EnMonthWord enAt enDay)
-      )  # EnDateMonthAroundAlias
-    // e.g.: 5th of next April | next April on the 5th
-    | (
-        (enDay enAt? Comma? EnAroundWord EnMonthValue)
-        | (EnAroundWord EnMonthValue enAt? Comma? enDay)
-      )  # EnDateMonthAroundAlias_2
     // e.g.: next day
-    | EnAroundWord EnDayWord                                        # EnDateDayAroundAlias
+    : EnAroundWord EnDayWord                   # EnDateDayAroundAlias
     // e.g.: tomorrow
-    | EnAroundDayWord                                               # EnDateDayAroundAlias_2
-    // e.g.: next friday | friday of next week
-    | (
-        (EnAroundWord? EnWeekValue)
-        | (EnWeekValue enAt? Comma? EnAroundWord EnWeekWord)
-      )  # EnDateWeekAroundAlias
-
-    // e.g.: April 5, 3 years later | April 5 after 3 years | 3 years later on April 5 | after 3 years, on April 5
-    | (
-        (enMonthDay Comma? stepValue EnYearWord enStepAliasMark)
-        | (enMonthDay Comma? enStepAliasMark stepValue EnYearWord)
-        | (stepValue EnYearWord enStepAliasMark Comma? enAt? enMonthDay)
-        | (enStepAliasMark stepValue EnYearWord Comma? enAt? enMonthDay)
-      )  # EnDateYearAroundStep
-    // e.g.: 5th 3 months later | 5th after 3 months
-    | (
-        (enDay Comma? stepValue EnMonthWord enStepAliasMark)
-        | (enDay Comma? enStepAliasMark stepValue EnMonthWord)
-      )  # EnDateMonthAroundStep
+    | EnAroundDayWord                          # EnDateDayAroundAlias_2
     // e.g.: 3 days later | after 3 days
     | (
         (stepValue EnDayWord enStepAliasMark)
         | (enStepAliasMark stepValue EnDayWord)
       )  # EnDateDayAroundStep
+    ;
+
+enWeekDay
+    // e.g.: next friday | friday of next week
+    : (
+        (EnAroundWord? EnWeekValue)
+        | (EnWeekValue Comma? enAt? EnAroundWord EnWeekWord)
+      )  # EnDateWeekAroundAlias
     // e.g.: friday, 3 weeks later | friday, after 3 weeks
     | (
         (EnWeekValue Comma? stepValue EnWeekWord enStepAliasMark)
@@ -141,8 +131,26 @@ enDateAround
     ;
 
 enMonthDay
-    : EnMonthValue enDay
-    | enDay enAt? EnMonthValue
+    : enMonth Comma? enAt? enDay
+    | enDay Comma? enAt? enMonth
+    ;
+
+enYear
+    : EnAroundWord EnYearWord
+    | stepValue EnYearWord enStepAliasMark
+    | yearValue
+    ;
+
+enMonth
+    // e.g.: April | next April
+    : EnAroundWord? EnMonthValue
+    // e.g.: next month
+    | EnAroundWord EnMonthWord
+    // e.g.: 3 months later | after 3 months
+    | (
+        (stepValue EnMonthWord enStepAliasMark)
+        | (enStepAliasMark stepValue EnMonthWord)
+    )
     ;
 
 enDay
@@ -306,7 +314,7 @@ yearValue
 stepValue 
     : YearNumber
     | DateNumber
-    | NormaNumber
+    | NormalNumber
     ;
     
 
@@ -346,6 +354,7 @@ enUselessWords
     | EnAtWord
     | EnAndWord
     | EnToWord
+    | EnFrom
     ;
 
 zhUselessWords

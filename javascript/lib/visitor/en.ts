@@ -1,8 +1,8 @@
-import { AnalyzerDateValue, AnalyzerPeriodDateTimeValue } from './../model';
-import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateYearAroundAliasContext, EnDateMonthAroundAliasContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateYearAroundStepContext, EnDateMonthAroundStepContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateTimeToTimeContext, EnPeriodDateTimeToDateTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnDateMonthAroundAlias_2Context } from "../grammar/TimeParser";
+import { AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodValueType, StepOffsetType } from './../model';
+import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateTimeToTimeContext, EnPeriodDateTimeToDateTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from "../model";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue } from "./en.utils";
-import { computedAroundTime, getCurrentYear, parseStepValue } from "./std.utils";
+import { computedAroundTime, getCurrentYear, parseStepValue, parseYearValue } from "./std.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
 import { parsePeriodDateTimeToTime, parseWeekDay_startAtSunday } from './common.utils';
 import { parseToInt } from '../utils/convert';
@@ -12,18 +12,18 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   //// enPeriodDateTime
 	visitEnPeriodDateToDate(ctx: EnPeriodDateToDateContext): AnalyzerValue {
     return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.Date,
       this.visit(ctx.enDate()[0]),
-      this.visit(ctx.enDate()[1]), {
-        context: ctx,
-      }
+      this.visit(ctx.enDate()[1]),
+      ctx,
     );
   };
 	visitEnPeriodDateTimeToDateTime(ctx: EnPeriodDateTimeToDateTimeContext): AnalyzerValue {
     return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.DateTime,
       this.visit(ctx.enDateTime()[0]),
-      this.visit(ctx.enDateTime()[1]), {
-        context: ctx,
-      }
+      this.visit(ctx.enDateTime()[1]),
+      ctx,
     );
   };
 	visitEnPeriodDateTimeToTime (ctx: EnPeriodDateTimeToTimeContext): AnalyzerValue {
@@ -35,10 +35,108 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
 	visitEnPeriodTimeToTime (ctx: EnPeriodTimeToTimeContext): AnalyzerValue {
     return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.Time,
       this.visit(ctx.enTime()[0]),
-      this.visit(ctx.enTime()[1]), {
-        context: ctx,
-      }
+      this.visit(ctx.enTime()[1]),
+      ctx,
+    );
+  };
+	visitEnPeriodMonthDayToMonthDay (ctx: EnPeriodMonthDayToMonthDayContext): AnalyzerValue {
+    const month = this.visit(ctx.enMonth()) as AnalyzerDateValue;
+    if (ctx.enYear()) {
+      const year = this.visit(ctx.enYear()) as AnalyzerDateValue;
+      month.year = year.year;
+    }
+    const startDay = parseEnDay(ctx.enDay()[0]);
+    const endDay = parseEnDay(ctx.enDay()[1]);
+    return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.Date,
+      new AnalyzerDateValue(
+        month.year,
+        month.month,
+        startDay,
+      ),
+      new AnalyzerDateValue(
+        month.year,
+        month.month,
+        endDay,
+      ),
+      ctx,
+    );
+  };
+  visitEnPeriodWeek_1(ctx: EnPeriodWeek_1Context): AnalyzerValue {
+    const startWeekDay = parseEnWeekValue(ctx.EnWeekValue()[0]);
+    const endWeekDay = parseEnWeekValue(ctx.EnWeekValue()[0]);
+    if (startWeekDay === -1 || endWeekDay === -1) {
+      return null;
+    }
+
+    let startAroundValue = 0;
+    let endAroundValue = 0;
+
+    if (ctx.EnAroundWord()) {
+      startAroundValue = parseEnAroundWord(ctx.EnAroundWord()[0]);
+      endAroundValue = ctx.EnAroundWord().length >= 2
+        ? parseEnAroundWord(ctx.EnAroundWord()[1])
+        : startAroundValue;
+    }
+
+
+    const startDate = new Date();
+    const endDate = new Date();
+
+    const startSplit = startWeekDay - parseWeekDay_startAtSunday(startDate.getDay());
+    const endSplit =  endWeekDay - parseWeekDay_startAtSunday(endDate.getDay());
+
+    startDate.setDate(startDate.getDate() + 7 * startAroundValue + startSplit);
+    endDate.setDate(endDate.getDate() + 7 * endAroundValue + endSplit);
+
+    return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.Date,
+      new AnalyzerDateValue(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+      ),
+      new AnalyzerDateValue(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate(),
+      ),
+      ctx,
+    );
+  };
+	visitEnPeriodWeek_2(ctx: EnPeriodWeek_2Context): AnalyzerValue {
+    const startWeekDay = parseEnWeekValue(ctx.EnWeekValue()[0]);
+    const endWeekDay = parseEnWeekValue(ctx.EnWeekValue()[0]);
+    if (startWeekDay === -1 || endWeekDay === -1) {
+      return null;
+    }
+
+    let aroundValue = parseStepValue(ctx.stepValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
+
+    const startDate = new Date();
+    const endDate = new Date();
+
+    const startSplit = startWeekDay - parseWeekDay_startAtSunday(startDate.getDay());
+    const endSplit =  endWeekDay - parseWeekDay_startAtSunday(endDate.getDay());
+
+    startDate.setDate(startDate.getDate() + 7 * aroundValue + startSplit);
+    endDate.setDate(endDate.getDate() + 7 * aroundValue + endSplit);
+    
+    return new AnalyzerPeriodDateTimeValue(
+      AnalyzerPeriodValueType.Date,
+      new AnalyzerDateValue(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate(),
+      ),
+      new AnalyzerDateValue(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate(),
+      ),
+      ctx,
     );
   };
 
@@ -59,15 +157,16 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enDateNormal
 	visitEnDateNormal (ctx: EnDateNormalContext): AnalyzerValue {
+    if (ctx.enWeekDay()) {
+      return this.visit(ctx.enWeekDay());
+    }
     const value = this.visit(ctx.enMonthDay()) as AnalyzerDateValue | null;
     if (!value) {
       return null;
     }
-    const year = ctx.YearNumber()
-      ? parseToInt(ctx.YearNumber().text)
-      : getCurrentYear();
-    if (year) {
-      value.year = year;
+    if (ctx.enYear()) {
+      const year = this.visit(ctx.enYear()) as AnalyzerDateValue;
+      value.year = year.year;
     }
     value.resetContext(ctx);
     return value;
@@ -104,7 +203,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     const values = ctx.stepValue().map((item) => parseStepValue(item));
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
-        parseEnStepAliasMark(ctx. enStepAliasMark()),
+        parseEnStepAliasMark(ctx.enStepAliasMark()),
         { hour: values[0], minute: values[1] || 0 },
       ),
       ctx,
@@ -124,56 +223,6 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enDateAround
 
-  /// EnDateYearAroundAlias
-  visitEnDateYearAroundAlias (ctx: EnDateYearAroundAliasContext): AnalyzerValue {
-    const date = this.visit(ctx.enMonthDay()) as AnalyzerDateValue;
-    if (!date) {
-      return null;
-    }
-    const year = parseEnAroundWord(ctx.EnAroundWord());
-    if (year) {
-      date.year = date.year + year;
-    }
-    date.resetContext(ctx);
-    return date;
-  };
-
-  /// EnDateMonthAroundAlias
-  visitEnDateMonthAroundAlias(ctx: EnDateMonthAroundAliasContext): AnalyzerValue {
-    const aroundType = parseEnAroundWord(ctx.EnAroundWord());
-    const now = new Date();
-    const year = getCurrentYear();
-    const month = now.getMonth() + aroundType;
-    const day = parseEnDay(ctx.enDay());
-    if (day <= 0) {
-      return null;
-    }
-    return new AnalyzerDateValue(
-      year,
-      month,
-      day, {
-        context: ctx,
-      }
-    );
-  };
-
-	visitEnDateMonthAroundAlias_2(ctx: EnDateMonthAroundAlias_2Context): AnalyzerValue {
-    const aroundType = parseEnAroundWord(ctx.EnAroundWord());
-    const year = getCurrentYear() + aroundType;
-    const month = parseEnMonthValue(ctx.EnMonthValue());
-    const day = parseEnDay(ctx.enDay());
-    if (day <= 0) {
-      return null;
-    }
-    return new AnalyzerDateValue(
-      year,
-      month,
-      day, {
-        context: ctx,
-      }
-    );
-  };
-
   /// EnDateDayAroundAlias
   visitEnDateDayAroundAlias(ctx: EnDateDayAroundAliasContext): AnalyzerValue {
     const now = new Date();
@@ -182,9 +231,8 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     return new AnalyzerDateValue(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate(), {
-        context: ctx,
-      }
+      now.getDate(),
+      ctx,
     );
   };
   visitEnDateDayAroundAlias_2(ctx: EnDateDayAroundAlias_2Context): AnalyzerValue {
@@ -194,15 +242,14 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     return new AnalyzerDateValue(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate(), {
-        context: ctx,
-      }
+      now.getDate(),
+      ctx,
     );
   };
 
   /// EnDateWeekAroundAlias
   visitEnDateWeekAroundAlias (ctx: EnDateWeekAroundAliasContext): AnalyzerValue {
-    const roundType = parseEnAroundWord(ctx.EnAroundWord());
+    const aroundValue = parseEnAroundWord(ctx.EnAroundWord());
     const weekValue = parseEnWeekValue(ctx.EnWeekValue());
     if (weekValue === -1) {
       return null;
@@ -210,42 +257,21 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     const split = weekValue - parseWeekDay_startAtSunday(now.getDay());
-    now.setDate(now.getDate() + 7 * roundType + split);
+    now.setDate(now.getDate() + 7 * aroundValue + split);
     return new AnalyzerDateValue(
       now.getFullYear(),
       now.getMonth(),
-      now.getDate(), {
-        context: ctx,
-      }
+      now.getDate(),
+      ctx,
     );
-  };
-
-  /// EnDateYearAroundStep
-  visitEnDateYearAroundStep (ctx: EnDateYearAroundStepContext): AnalyzerValue {
-    const date = this.visit(ctx.enMonthDay()) as AnalyzerDateValue;
-    date.year = getCurrentYear() + parseStepValue(ctx.stepValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
-    return date;
-  };
-
-  /// EnDateMonthAroundStep
-  visitEnDateMonthAroundStep(ctx: EnDateMonthAroundStepContext): AnalyzerValue {
-    const now = new Date();
-    const splitMonth = parseEnStepAliasMark(ctx.enStepAliasMark()) * parseStepValue(ctx.stepValue());
-    now.setMonth(now.getMonth() + splitMonth )
-    const day = parseEnDay(ctx.enDay());
-    if (day <= 0) {
-      return;
-    }
-    now.setDate(day);
-    return AnalyzerDateValue.fromDateTime(now, ctx);
   };
 
   /// EnDateDayAroundStep
   visitEnDateDayAroundStep(ctx: EnDateDayAroundStepContext): AnalyzerValue {
     const now = new Date();
     const days = parseStepValue(ctx.stepValue());
-    const aroundType = parseEnStepAliasMark(ctx.enStepAliasMark());
-    now.setDate(now.getDate() + days * aroundType);
+    const offsetType = parseEnStepAliasMark(ctx.enStepAliasMark());
+    now.setDate(now.getDate() + days * offsetType);
     return AnalyzerDateValue.fromDateTime(now, ctx);
   };
 
@@ -259,17 +285,80 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
   
 	visitEnMonthDay (ctx: EnMonthDayContext): AnalyzerDateValue {
-    const month = parseEnMonthValue(ctx.EnMonthValue());
+    const month = this.visit(ctx.enMonth()) as AnalyzerDateValue;
     const day = parseEnDay(ctx.enDay());
-    if (month < 0 && day <= 0) {
+    if (day <= 0) {
       return null;
     }
     return new AnalyzerDateValue(
-      getCurrentYear(),
-      month,
-      day, {
-        context: ctx,
-      }
+      month.year,
+      month.month,
+      day,
+      ctx,
     );
+  };
+
+	visitEnYear(ctx: EnYearContext): AnalyzerDateValue {
+    if (ctx.EnAroundWord()) {
+      const aroundValue = parseEnAroundWord(ctx.EnAroundWord());
+      return new AnalyzerDateValue(
+        getCurrentYear() + aroundValue,
+        -1,
+        0,
+      );
+    }
+    if (ctx.stepValue()) {
+      const offsetType = parseEnStepAliasMark(ctx.enStepAliasMark());
+      
+      return new AnalyzerDateValue(
+        getCurrentYear() + parseStepValue(ctx.stepValue()) * offsetType,
+        -1,
+        0,
+      );
+    }
+    if (ctx.yearValue()) {
+      return new AnalyzerDateValue(
+        parseYearValue(ctx.yearValue()),
+        -1,
+        0,
+      );
+    }
+    throw new Error('Never attach code');
+  };
+
+	visitEnMonth(ctx: EnMonthContext): AnalyzerDateValue {
+    if (ctx.EnAroundWord() && ctx.EnMonthWord()) {
+      const date = new Date();
+      date.setMonth(date.getMonth() + parseEnAroundWord(ctx.EnAroundWord()));
+      return new AnalyzerDateValue(
+        date.getFullYear(),
+        date.getMonth(),
+        0,
+      );
+    }
+
+    if (ctx.EnMonthValue()) {
+      const date = new Date();
+      date.setMonth(parseEnMonthValue(ctx.EnMonthValue()));
+      if (ctx.EnAroundWord()) {
+        date.setFullYear(date.getFullYear() + parseEnAroundWord(ctx.EnAroundWord()));
+      }
+      return new AnalyzerDateValue(
+        date.getFullYear(),
+        date.getMonth(),
+        0,
+      );
+    }
+
+    if (ctx.stepValue()) {
+      const date = new Date();
+      date.setMonth(date.getMonth() + parseStepValue(ctx.stepValue()) * parseEnStepAliasMark(ctx.enStepAliasMark()));
+      return new AnalyzerDateValue(
+        date.getFullYear(),
+        date.getMonth(),
+        0,
+      );
+    }
+    throw new Error('Never attach code');
   };
 }

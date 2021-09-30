@@ -1,7 +1,10 @@
 import { ParserRuleContext } from "antlr4ts";
 
-// parse result for: before, after, ago, '前', '后' ...
-export type AroundType = -1 | 1 | 0;
+// parse result for: before, after, ago
+export type StepOffsetType = -1 | 1 | 0;
+
+// last, this, next, the day before yesterday, 
+export type AroundValue = -2 | -1 | 0 | 1 | 2;
 
 export enum AnalyzerValueType {
   PeriodDateTime = 'PeriodDateTime',
@@ -9,6 +12,12 @@ export enum AnalyzerValueType {
   Date = 'Date',
   Time = 'Time',
   ValueArray = 'ValueArray',
+}
+
+export enum AnalyzerPeriodValueType {
+  DateTime = 'DateTime',
+  Date = 'Date',
+  Time = 'Time',
 }
 
 // match data of text
@@ -25,10 +34,6 @@ export class MatchData {
       this.endIndex = context.stop.stopIndex + 1;
     }
   }
-}
-
-interface AnalyzerValueOptions {
-  context?: ParserRuleContext;
 }
 
 // remove useless match (at header or suffix)
@@ -68,18 +73,21 @@ export abstract class AnalyzerValue {
 
 export class AnalyzerPeriodDateTimeValue extends AnalyzerValue {
   constructor(
+    periodType: AnalyzerPeriodValueType,
     start: AnalyzerValue,
     end: AnalyzerValue,
-    options: AnalyzerValueOptions,
+    context?: ParserRuleContext,
   ) {
     super({
       valueType:  AnalyzerValueType.PeriodDateTime,
-      context: options.context,
+      context: context,
     });
+    this.periodType = periodType;
     this.start = start;
     this.end = end;
   }
 
+  periodType: AnalyzerPeriodValueType = null;
   start: AnalyzerValue = null;
   end: AnalyzerValue = null;
 }
@@ -90,11 +98,11 @@ export class AnalyzerDateValue extends AnalyzerValue {
     year: number,
     month: number,
     day: number,
-    options: AnalyzerValueOptions,
+    context?: ParserRuleContext,
   ) {
     super({
       valueType:  AnalyzerValueType.Date,
-      context: options.context,
+      context: context,
     });
     this.year = year;
     this.month = month;
@@ -112,9 +120,8 @@ export class AnalyzerDateValue extends AnalyzerValue {
     return new AnalyzerDateValue(
       dateTime.getFullYear(),
       dateTime.getMonth(),
-      dateTime.getDate(), {
-        context,
-      },
+      dateTime.getDate(),
+      context,
     );
   }
 }
@@ -125,11 +132,11 @@ export class AnalyzerTimeValue extends AnalyzerValue {
     hour: number,
     minute: number,
     second: number = 0,
-    options: AnalyzerValueOptions,
+    context?: ParserRuleContext,
   ) {
     super({
       valueType:  AnalyzerValueType.Time,
-      context: options.context,
+      context: context,
     });
     this.hour = hour;
     this.minute = minute;
@@ -148,9 +155,8 @@ export class AnalyzerTimeValue extends AnalyzerValue {
     return new AnalyzerTimeValue(
       dateTime.getHours(),
       dateTime.getMinutes(),
-      dateTime.getSeconds(), {
-        context,
-      }
+      dateTime.getSeconds(),
+      context,
     );
   }
 }
@@ -163,11 +169,11 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
     hour: number,
     minute: number,
     second: number = 0,
-    options: AnalyzerValueOptions,
+    context?: ParserRuleContext,
   ) {
     super({
       valueType: AnalyzerValueType.Time,
-      context: options.context,
+      context: context,
     });
     this.year = year;
     this.month = month;
@@ -188,9 +194,8 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
       dateValue.day,
       timeValue.hour,
       timeValue.minute,
-      timeValue.second, {
-        context: context,
-      }
+      timeValue.second,
+      context,
     );
   }
 
@@ -204,9 +209,8 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
       dateTime.getDate(),
       dateTime.getHours(),
       dateTime.getMinutes(),
-      dateTime.getSeconds(), {
-        context,
-      }
+      dateTime.getSeconds(),
+      context,
     );
   }
 

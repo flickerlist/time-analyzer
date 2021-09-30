@@ -1,11 +1,11 @@
 import { parseWeekDay_startAtSunday } from './common.utils';
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { EnDayContext, EnStepAliasMarkContext } from "../grammar/TimeParser";
-import { AroundType } from "../model";
 import { parseToInt } from "../utils/convert";
+import { AroundValue, StepOffsetType } from '../model';
 
 // parse around mark (before, after, ago ...)
-export function parseEnStepAliasMark(mark: EnStepAliasMarkContext): AroundType {
+export function parseEnStepAliasMark(mark: EnStepAliasMarkContext): StepOffsetType {
   if (mark.EnBeforeWord()) {
     return -1;
   }
@@ -106,7 +106,7 @@ export function parseEnWeekValue(ctx: TerminalNode): -1 | number {
 }
 
 // parse EnAroundWord
-export function parseEnAroundWord(ctx: TerminalNode | null): AroundType {
+export function parseEnAroundWord(ctx: TerminalNode | null): AroundValue {
   if (!ctx) {
     return 0;
   }
@@ -123,7 +123,7 @@ export function parseEnAroundWord(ctx: TerminalNode | null): AroundType {
 }
 
 // parse EnAroundDay
-export function parseEnAroundDayWord(ctx: TerminalNode): number {
+export function parseEnAroundDayWord(ctx: TerminalNode): AroundValue {
   switch(ctx.text.toUpperCase()) {
     case 'THE DAY BEFORE YESTERDAY':
       return -2;

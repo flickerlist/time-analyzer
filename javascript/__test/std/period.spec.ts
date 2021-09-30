@@ -1,12 +1,13 @@
-import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
+import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
 
 describe('Standard Period', () => {
   
-  test('Date', () => {
+  test('PeriodDate', () => {
     const values = new TimeAnalyzer('2022-07-01~2022-07-05').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.PeriodDateTime,
+      periodType: AnalyzerPeriodValueType.Date,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2022,
@@ -27,11 +28,12 @@ describe('Standard Period', () => {
     });
   });
   
-  test('Date', () => {
+  test('PeriodDate', () => {
     const values = new TimeAnalyzer('07-01~07-05').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.PeriodDateTime,
+      periodType: AnalyzerPeriodValueType.Date,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2021,
@@ -52,11 +54,12 @@ describe('Standard Period', () => {
     });
   });
   
-  test('DateTime', () => {
+  test('PeriodDateTime', () => {
     const values = new TimeAnalyzer('07-01 15:30-16:30').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.PeriodDateTime,
+      periodType: AnalyzerPeriodValueType.DateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: 2021,

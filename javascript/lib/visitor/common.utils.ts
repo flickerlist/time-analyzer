@@ -1,5 +1,5 @@
 import { ParserRuleContext } from "antlr4ts";
-import { AnalyzerDateTimeValue, AnalyzerPeriodDateTimeValue, AnalyzerTimeValue } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodValueType, AnalyzerTimeValue } from "../model";
 
 // parse period type: dateTime to time
 export function parsePeriodDateTimeToTime(
@@ -13,16 +13,14 @@ export function parsePeriodDateTimeToTime(
     startDateTime.day,
     endTime.hour,
     endTime.minute,
-    endTime.second, {
-      context: null,
-    }
+    endTime.second,
   );
   
   return new AnalyzerPeriodDateTimeValue(
+    AnalyzerPeriodValueType.DateTime,
     startDateTime,
-    endDateTime, {
-      context: ctx,
-    }
+    endDateTime,
+    ctx,
   );
 }
 

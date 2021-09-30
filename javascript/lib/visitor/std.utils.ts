@@ -1,5 +1,5 @@
-import { AroundType } from "../model";
 import { StepValueContext, YearValueContext } from "../grammar/TimeParser";
+import { StepOffsetType } from "../model";
 import { parseToInt } from "../utils/convert";
 
 export function parseYearValue(yearValue: YearValueContext): number {
@@ -38,11 +38,8 @@ export function getCurrentYear(): number {
 /**
  * computed date abount around values, such as:
  *    3 days later, after 2 hours
- * @param aroundType 
- * @param param1 
- * @returns 
  */
-export function computedAroundTime(aroundType: AroundType, {
+export function computedAroundTime(offsetType: StepOffsetType, {
   year,
   month,
   week,
@@ -62,25 +59,25 @@ export function computedAroundTime(aroundType: AroundType, {
   const now = new Date();
   now.setSeconds(0, 0);
   if (year) {
-    now.setFullYear(now.getFullYear() + aroundType * year);
+    now.setFullYear(now.getFullYear() + offsetType * year);
   }
   if (month) {
-    now.setMonth(now.getMonth() + aroundType * month);
+    now.setMonth(now.getMonth() + offsetType * month);
   }
   if (week) {
-    now.setDate(now.getDate() + aroundType * week * 7);
+    now.setDate(now.getDate() + offsetType * week * 7);
   }
   if (day) {
-    now.setDate(now.getDate() + aroundType * day);
+    now.setDate(now.getDate() + offsetType * day);
   }
   if (hour) {
-    now.setHours(now.getHours() + aroundType * hour);
+    now.setHours(now.getHours() + offsetType * hour);
   }
   if (minute) {
-    now.setMinutes(now.getMinutes() + aroundType * minute);
+    now.setMinutes(now.getMinutes() + offsetType * minute);
   }
   if (second) {
-    now.setSeconds(now.getSeconds() + aroundType * second);
+    now.setSeconds(now.getSeconds() + offsetType * second);
   }
   return now;
 }

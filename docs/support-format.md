@@ -76,11 +76,23 @@
 - at 5:50 on Saturday afternoon
 
 ### Period
-- March 3-5, 2002
-- March 3 to 5
 - March 4 to April 4th
-- Next Mon.-Fri.
 - Next Monday to Next Friday
+- yesterday to the day after tomorrow
+- tomorrow to 5th, this month
+
+- March 3rd-5th, 2002
+- March 3-5, 2002
+- March 3rd to 5th, 2002
+- March 3 to 5
+- 3rd to 5th of next month
+- next month, on the 3-5
+
+- Next Mon.-Fri.
+- From this Mon. to next Fri.
+- From Mon.-Fri. of next week
+- Mon.-Fri., after 3 weeks
+- after 3 weeks, from Mon.-Fri.
 
 - 1pm to 3pm
 - 1:30pm - 3pm
