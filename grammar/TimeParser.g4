@@ -13,9 +13,8 @@ statementList
     ;
 
 statement
-    : enAt? enPeriodDateTime
-    | zhAt? zhPeriodDateTime
-    | enAt? stdPeriodDateTime
+    : enAt? enPeriod
+    | zhAt? zhPeriod
 
     | enAt? enDateTime
     | zhAt? zhDateTime
@@ -23,22 +22,20 @@ statement
 
     | enAt? enDate
     | zhAt? zhDate
-    | enAt? stdDate
 
     | enAt? enTime
     | zhAt? zhTime
-    | enAt? stdTime
 
     | enAt? enDirectTimeAround
     | zhAt? zhDirectTimeAround
     ;
 
 //// std
-stdPeriodDateTime
-    : stdDate stdPeriodTo stdDate             # StdPeriodDateToDate
-    | stdDateTime stdPeriodTo stdDateTime     # StdPeriodDateTimeToDateTime
-    | stdDateTime stdPeriodTo stdTime         # StdPeriodDateTimeToTime
-    | stdTime stdPeriodTo stdTime             # StdPeriodTimeToTime
+stdPeriod
+    : stdDate stdPeriodTo stdDate                            # StdPeriodDateToDate
+    | stdDateTime stdPeriodTo stdDateTime                    # StdPeriodDateTimeToDateTime
+    | stdDateTime stdPeriodTo stdTime                        # StdPeriodDateTimeToTime
+    | stdTime stdPeriodTo stdTime Comma? stdDate?            # StdPeriodTimeToTime
     ;
 
 stdDateTime
@@ -69,24 +66,31 @@ stdPeriodTo
     ;
 
 //// en
-enPeriodDateTime
-    : EnFrom? enDate enPeriodTo enDate             # EnPeriodDateToDate
-    | EnFrom? enDateTime enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
-    | EnFrom? enDateTime enPeriodTo enTime         # EnPeriodDateTimeToTime
-    | EnFrom? enTime enPeriodTo enTime             # EnPeriodTimeToTime
+enPeriod
+    : enPeriodWeek                                              # EnPeriodWeekDayNode 
     // e.g.: March 3rd-5th, 2002 | March 3-5, 2002 | March 3rd to 5th, 2002 | 3rd to 5th of next month | next month, on the 3-5
     | EnFrom? (
-        (enMonth enDay enPeriodTo enDay)
+        (enMonth Comma? enAt? enDay enPeriodTo enDay)
         | (enDay enPeriodTo enDay Comma? enAt? enMonth)
      ) Comma? enAt? enYear?  # EnPeriodMonthDayToMonthDay
-    | enPeriodWeek                                 # EnPeriodWeekDayNode 
+    
+    | EnFrom? enDateTime Comma? enAt? enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
+    | EnFrom? enDateTime Comma? enAt? enPeriodTo enTime         # EnPeriodDateTimeToTime
+    | EnFrom? enDate Comma? enAt? enPeriodTo enDate             # EnPeriodDateToDate
+    | EnFrom? enTime Comma? enAt? enPeriodTo enTime (Comma? enAt? enDate)?  # EnPeriodTimeToTime
     ;
 
 enPeriodWeek
-    // e.g.: Next Mon.-Fri. | From this Mon. to next Fri. | From Mon.-Fri. of next week
-    : (EnFrom? (EnAroundWord? EnWeekValue enPeriodTo EnAroundWord? EnWeekValue) | (EnWeekValue enPeriodTo EnWeekValue Comma? enAt? EnAroundWord EnWeekValue))  # EnPeriodWeek_1
     // e.g.: Mon.-Fri., after 3 weeks | after 3 weeks, from Mon.-Fri.
-    | ((EnFrom? EnWeekValue enPeriodTo EnWeekValue Comma? enAt? enStepAliasMark stepValue EnWeekWord) | (enStepAliasMark stepValue EnWeekWord Comma? enAt? EnWeekValue enPeriodTo EnWeekValue))  # EnPeriodWeek_2
+    : (
+        (EnFrom? EnWeekValue enPeriodTo EnWeekValue Comma? enAt? enStepAliasMark stepValue EnWeekWord)
+        | (enStepAliasMark stepValue EnWeekWord Comma? enAt? EnWeekValue enPeriodTo EnWeekValue)
+      )  # EnPeriodWeek_1
+    // e.g.: Next Mon.-Fri. | From this Mon. to next Fri. | From Mon.-Fri. of next week
+    | (EnFrom? 
+        (EnWeekValue enPeriodTo EnWeekValue Comma? enAt? EnAroundWord EnWeekWord)
+        | (EnAroundWord? EnWeekValue enPeriodTo EnAroundWord? EnWeekValue)
+      )  # EnPeriodWeek_2
     ;
 
 enDateTime
@@ -97,6 +101,7 @@ enDateTime
 enDate
     : enDateAround
     | enDateNormal
+    | stdDate
     ;
 
 enDateNormal
@@ -159,11 +164,11 @@ enDay
     ;
 
 enTime
-    : stdTime (EnAfternoonWord | EnMorningWord)?                                   # EnTimeNormal
-    | (
+    : (
         (DateNumber EnHourWholeWord (EnAfternoonWord | EnMorningWord)?)
         | (DateNumber (EnAfternoonWord | EnMorningWord))
       )  # EnTimeOClock
+    | stdTime (EnAfternoonWord | EnMorningWord)?                                   # EnTimeNormal
     ;
 
 enDirectTimeAround
@@ -194,7 +199,7 @@ enAt
     ;
 
 //// zh
-zhPeriodDateTime
+zhPeriod
     : zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
     | zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToTime
     | zhDateTime zhPeriodTo zhTime         # ZhPeriodDateTimeToTime

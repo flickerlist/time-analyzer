@@ -28,6 +28,7 @@
 - 07-01 15:30~16:30
 - 07-01 15:30-16:30
 - 15:30-16:30
+- 15:30-16:30, 2022-07-01
 
 ## English time
 > `before` equals to `ago`
@@ -81,8 +82,8 @@
 - yesterday to the day after tomorrow
 - tomorrow to 5th, this month
 
-- March 3rd-5th, 2002
 - March 3-5, 2002
+- March 3rd-5th, 2002
 - March 3rd to 5th, 2002
 - March 3 to 5
 - 3rd to 5th of next month
@@ -98,8 +99,13 @@
 - 1:30pm - 3pm
 
 - March 5th, 1 p.m. to 3 p.m.
-- March 5th at 1 p.m. to March 6th at 3 p.m.
-- 1pm tomorrow to 3pm the day after tomorrow
+- March 5th at 1 p.m. to Apr. 6th at 3 p.m.
+- 1pm tomorrow, to 3pm the day after tomorrow
+- 1 p.m. to 3 p.m., next Friday
+
+### Direct time around
+- after 3 hours and 30 minutes
+- 3 hours before
 
 ## Chinese Time
 > Support `zh-CN`, `zh-TW`, `zh-HK`.
