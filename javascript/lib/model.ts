@@ -6,8 +6,10 @@ export type StepOffsetType = -1 | 1 | 0;
 // last, this, next, the day before yesterday, 
 export type AroundValue = -2 | -1 | 0 | 1 | 2;
 
+export type WeekValues = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
 export enum AnalyzerValueType {
-  PeriodDateTime = 'PeriodDateTime',
+  Period = 'Period',
   DateTime = 'DateTime',
   Date = 'Date',
   Time = 'Time',
@@ -71,7 +73,7 @@ export abstract class AnalyzerValue {
   }
 }
 
-export class AnalyzerPeriodDateTimeValue extends AnalyzerValue {
+export class AnalyzerPeriodValue extends AnalyzerValue {
   constructor(
     periodType: AnalyzerPeriodValueType,
     start: AnalyzerValue,
@@ -79,7 +81,7 @@ export class AnalyzerPeriodDateTimeValue extends AnalyzerValue {
     context?: ParserRuleContext,
   ) {
     super({
-      valueType:  AnalyzerValueType.PeriodDateTime,
+      valueType:  AnalyzerValueType.Period,
       context: context,
     });
     this.periodType = periodType;

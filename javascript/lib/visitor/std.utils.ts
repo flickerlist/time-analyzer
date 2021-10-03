@@ -57,7 +57,7 @@ export function computedAroundTime(offsetType: StepOffsetType, {
   second?: number;
 }): Date {
   const now = new Date();
-  now.setSeconds(0, 0);
+  now.setMilliseconds(0);
   if (year) {
     now.setFullYear(now.getFullYear() + offsetType * year);
   }

@@ -1,14 +1,14 @@
-import { StdDateTimeContext, StdDateContext, StdTimeContext, StdPeriodDateToDateContext, StdPeriodDateTimeToTimeContext, StdPeriodDateTimeToDateTimeContext, StdPeriodTimeToTimeContext } from "../grammar/TimeParser";
-import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodValueType } from "../model";
+import { StdDateTimeContext, StdDateContext, StdTimeContext, StdPeriodDateToDateContext, StdPeriodTimeToTimeContext, StdPeriodDateTimeToTimeContext, StdPeriodDateTimeToDateTimeContext } from "../grammar/TimeParser";
+import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType } from "../model";
 import { BasicTimeAnalyzerVisitor } from "./basic";
-import { parsePeriodDateTimeToTime } from "./common.utils";
+import { parsePeriodToTime } from "./common.utils";
 import { getCurrentYear, parseYearValue } from "./std.utils";
 import { parseToInt, parseToMonthValue } from "../utils/convert";
 
 export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
 
 	visitStdPeriodDateToDate = (ctx: StdPeriodDateToDateContext): AnalyzerValue => {
-    return new AnalyzerPeriodDateTimeValue(
+    return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
       this.visit(ctx.stdDate()[0]),
       this.visit(ctx.stdDate()[1]),
@@ -17,7 +17,7 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
 
 	visitStdPeriodDateTimeToDateTime = (ctx: StdPeriodDateTimeToDateTimeContext): AnalyzerValue => {
-    return new AnalyzerPeriodDateTimeValue(
+    return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.DateTime,
       this.visit(ctx.stdDateTime()[0]),
       this.visit(ctx.stdDateTime()[1]),
@@ -26,7 +26,7 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
 
 	visitStdPeriodDateTimeToTime = (ctx: StdPeriodDateTimeToTimeContext): AnalyzerValue => {
-    return parsePeriodDateTimeToTime(
+    return parsePeriodToTime(
       this.visit(ctx.stdDateTime()) as AnalyzerDateTimeValue,
       this.visit(ctx.stdTime()) as AnalyzerTimeValue,
       ctx,
@@ -34,10 +34,30 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
 
 	visitStdPeriodTimeToTime = (ctx: StdPeriodTimeToTimeContext): AnalyzerValue => {
-    return new AnalyzerPeriodDateTimeValue(
+    let date: AnalyzerDateValue = null;
+    if (ctx.stdDate()) {
+      date = this.visit(ctx.stdDate()) as AnalyzerDateValue;
+    }
+    const start = this.visit(ctx.stdTime()[0]) as AnalyzerTimeValue;
+    const end = this.visit(ctx.stdTime()[1]) as AnalyzerTimeValue;
+    if (date) {
+      return new AnalyzerPeriodValue(
+        AnalyzerPeriodValueType.DateTime,
+        new AnalyzerDateTimeValue(
+          date.year, date.month, date.day,
+          start.hour, start.minute, start.second,
+        ),
+        new AnalyzerDateTimeValue(
+          date.year, date.month, date.day,
+          end.hour, end.minute, end.second,
+        ),
+        ctx,
+      );
+    }
+    return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Time,
-      this.visit(ctx.stdTime()[0]),
-      this.visit(ctx.stdTime()[1]),
+      start,
+      end,
       ctx,
     );
   };

@@ -1,8 +1,8 @@
 import { ParserRuleContext } from "antlr4ts";
-import { AnalyzerDateTimeValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodValueType, AnalyzerTimeValue } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues } from "../model";
 
 // parse period type: dateTime to time
-export function parsePeriodDateTimeToTime(
+export function parsePeriodToTime(
   startDateTime: AnalyzerDateTimeValue,
   endTime: AnalyzerTimeValue,
   ctx: ParserRuleContext,
@@ -16,7 +16,7 @@ export function parsePeriodDateTimeToTime(
     endTime.second,
   );
   
-  return new AnalyzerPeriodDateTimeValue(
+  return new AnalyzerPeriodValue(
     AnalyzerPeriodValueType.DateTime,
     startDateTime,
     endDateTime,
@@ -25,14 +25,14 @@ export function parsePeriodDateTimeToTime(
 }
 
 // parse week day (start at monday, such in chinese)
-export function parseWeekDay_startAtMonday(originWeekDay: number): number {
-  if (originWeekDay === 0) {
-    return 7;
-  }
-  return originWeekDay;
-}
+// export function parseWeekDay_startAtMonday(originWeekDay: WeekValues): WeekValues {
+//   if (originWeekDay === 0) {
+//     return 7;
+//   }
+//   return originWeekDay;
+// }
 
 // parse week day (start at sunday, such in usa)
-export function parseWeekDay_startAtSunday(originWeekDay: number): number {
-  return originWeekDay;
+export function parseWeekDay_startAtSunday(originWeekDay: number): WeekValues {
+  return originWeekDay as WeekValues;
 }

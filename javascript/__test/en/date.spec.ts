@@ -1,3 +1,4 @@
+import { parseEnWeekValueToDate } from '@/lib/visitor/en.utils';
 import { StepOffsetType } from '@/lib/model';
 import { parseWeekDay_startAtSunday } from '@/lib/visitor/common.utils';
 import { getCurrentYear } from '@/lib/visitor/std.utils';
@@ -93,14 +94,13 @@ describe('En Date', () => {
     const values = new TimeAnalyzer('Mon.').values;
     expect(values).toHaveLength(1);
 
-    const targetWeekDay = parseWeekDay_startAtSunday(1);
-    const date = new Date();
-    date.setDate(date.getDate() + targetWeekDay - parseWeekDay_startAtSunday(date.getDay()));
+    const date = parseEnWeekValueToDate(1, 0);
+
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,
-      year: date.getFullYear(),
-      month: date.getMonth(),
-      day: date.getDate(),
+      year: date.year,
+      month: date.month,
+      day: date.day,
       match: {
         startIndex: 0,
         endIndex: 4,
@@ -113,14 +113,13 @@ describe('En Date', () => {
     const values = new TimeAnalyzer('Sunday').values;
     expect(values).toHaveLength(1);
 
-    const targetWeekDay = parseWeekDay_startAtSunday(0);
-    const date = new Date();
-    date.setDate(date.getDate() + targetWeekDay - parseWeekDay_startAtSunday(date.getDay()));
+    const date = parseEnWeekValueToDate(0, 0);
+
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,
-      year: date.getFullYear(),
-      month: date.getMonth(),
-      day: date.getDate(),
+      year: date.year,
+      month: date.month,
+      day: date.day,
       match: {
         startIndex: 0,
         endIndex: 6,
@@ -133,18 +132,13 @@ describe('En Date', () => {
     const values = new TimeAnalyzer('next friday').values;
     expect(values).toHaveLength(1);
 
-    const targetWeekDay = parseWeekDay_startAtSunday(5);
-    const date = new Date();
-    const weekDaysLength = 7;
-    const offsetType: StepOffsetType = 1;
-    date.setDate(date.getDate()
-      + weekDaysLength * offsetType 
-      + targetWeekDay - parseWeekDay_startAtSunday(date.getDay()));
+    const date = parseEnWeekValueToDate(5, 1);
+    
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Date,
-      year: date.getFullYear(),
-      month: date.getMonth(),
-      day: date.getDate(),
+      year: date.year,
+      month: date.month,
+      day: date.day,
       match: {
         startIndex: 0,
         endIndex: 11,

@@ -22,15 +22,12 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
   };
 
   visitStatement = (ctx: StatementContext): AnalyzerValue => {
-    // PeriodDateTime
-    if (ctx.zhPeriodDateTime()) {
-      return this.visit(ctx.zhPeriodDateTime());
+    // Period
+    if (ctx.zhPeriod()) {
+      return this.visit(ctx.zhPeriod());
     }
-    if (ctx.enPeriodDateTime()) {
-      return this.visit(ctx.enPeriodDateTime());
-    }
-    if (ctx.stdPeriodDateTime()) {
-      return this.visit(ctx.stdPeriodDateTime());
+    if (ctx.enPeriod()) {
+      return this.visit(ctx.enPeriod());
     }
     
     // DateTime
@@ -51,9 +48,6 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
     if (ctx.enDate()) {
       return this.visit(ctx.enDate());
     }
-    if (ctx.stdDate()) {
-      return this.visit(ctx.stdDate());
-    }
 
     // Time
     if (ctx.zhTime()) {
@@ -61,9 +55,6 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
     }
     if (ctx.enTime()) {
       return this.visit(ctx.enTime());
-    }
-    if (ctx.stdTime()) {
-      return this.visit(ctx.stdTime());
     }
 
     // DirectTimeAround
