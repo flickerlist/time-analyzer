@@ -1,6 +1,5 @@
-import { getCurrentYear } from '@/lib/visitor/std.utils';
 import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
-import { parseWeekDay_startAtSunday } from '@/lib/visitor/common.utils';
+import { parseWeekDay_startAtSunday, getCurrentYear } from '@/lib/visitor/common.utils';
 
 describe('En DateTime', () => {
 

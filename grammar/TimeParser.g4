@@ -72,7 +72,7 @@ enPeriod
     | EnFrom? (
         (enMonth Comma? enAt? enDay enPeriodTo enDay)
         | (enDay enPeriodTo enDay Comma? enAt? enMonth)
-     ) Comma? enAt? enYear?  # EnPeriodMonthDayToMonthDay
+      ) Comma? enAt? enYear?  # EnPeriodMonthDayToMonthDay
     
     | EnFrom? enDateTime Comma? enAt? enPeriodTo enDateTime     # EnPeriodDateTimeToDateTime
     | EnFrom? enDateTime Comma? enAt? enPeriodTo enTime         # EnPeriodDateTimeToTime
@@ -83,8 +83,8 @@ enPeriod
 enPeriodWeek
     // e.g.: Mon.-Fri., after 3 weeks | after 3 weeks, from Mon.-Fri.
     : (
-        (EnFrom? EnWeekValue enPeriodTo EnWeekValue Comma? enAt? enStepAliasMark stepValue EnWeekWord)
-        | (enStepAliasMark stepValue EnWeekWord Comma? enAt? EnWeekValue enPeriodTo EnWeekValue)
+        (EnFrom? EnWeekValue enPeriodTo EnWeekValue Comma? enAt? enStepAliasMark numberValue EnWeekWord)
+        | (enStepAliasMark numberValue EnWeekWord Comma? enAt? EnWeekValue enPeriodTo EnWeekValue)
       )  # EnPeriodWeek_1
     // e.g.: Next Mon.-Fri. | From this Mon. to next Fri. | From Mon.-Fri. of next week
     | (EnFrom? 
@@ -117,8 +117,8 @@ enDateAround
     | EnAroundDayWord                          # EnDateDayAroundAlias_2
     // e.g.: 3 days later | after 3 days
     | (
-        (stepValue EnDayWord enStepAliasMark)
-        | (enStepAliasMark stepValue EnDayWord)
+        (numberValue EnDayWord enStepAliasMark)
+        | (enStepAliasMark numberValue EnDayWord)
       )  # EnDateDayAroundStep
     ;
 
@@ -130,8 +130,8 @@ enWeekDay
       )  # EnDateWeekAroundAlias
     // e.g.: friday, 3 weeks later | friday, after 3 weeks
     | (
-        (EnWeekValue Comma? stepValue EnWeekWord enStepAliasMark)
-        | (EnWeekValue Comma? enStepAliasMark stepValue EnWeekWord)
+        (EnWeekValue Comma? numberValue EnWeekWord enStepAliasMark)
+        | (EnWeekValue Comma? enStepAliasMark numberValue EnWeekWord)
       )  # EnDateWeekAroundStep
     ;
 
@@ -142,7 +142,7 @@ enMonthDay
 
 enYear
     : EnAroundWord EnYearWord
-    | stepValue EnYearWord enStepAliasMark
+    | numberValue EnYearWord enStepAliasMark
     | yearValue
     ;
 
@@ -153,8 +153,8 @@ enMonth
     | EnAroundWord EnMonthWord
     // e.g.: 3 months later | after 3 months
     | (
-        (stepValue EnMonthWord enStepAliasMark)
-        | (enStepAliasMark stepValue EnMonthWord)
+        (numberValue EnMonthWord enStepAliasMark)
+        | (enStepAliasMark numberValue EnMonthWord)
     )
     ;
 
@@ -174,13 +174,13 @@ enTime
 enDirectTimeAround
     // e.g.: after 3 hours and 30 minutes | 3 hours and 30 minutes later
     : (
-        (enStepAliasMark stepValue EnHourWord (EnAndWord stepValue EnMinuteWord)?)
-        | (stepValue EnHourWord (EnAndWord stepValue EnMinuteWord)? enStepAliasMark)
+        (enStepAliasMark numberValue EnHourWord (EnAndWord numberValue EnMinuteWord)?)
+        | (numberValue EnHourWord (EnAndWord numberValue EnMinuteWord)? enStepAliasMark)
       )  # EnTimeHourStep
     // e.g.: after 30 minutes | 30 minutes later
     | (
-        (enStepAliasMark stepValue EnMinuteWord)
-        | (stepValue EnMinuteWord enStepAliasMark)
+        (enStepAliasMark numberValue EnMinuteWord)
+        | (numberValue EnMinuteWord enStepAliasMark)
       )  # EnTimeMinuteStep
     ;
 
@@ -200,68 +200,94 @@ enAt
 
 //// zh
 zhPeriod
-    : zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
-    | zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToTime
-    | zhDateTime zhPeriodTo zhTime         # ZhPeriodDateTimeToTime
-    | zhTime zhPeriodTo zhTime             # ZhPeriodTimeToTime
+    : zhPeriodWeek                         # ZhPeriodWeekDayNode
+    // e.g.: 从下个月3号到五号 | 3个月后，从3号到五号 | 3月3号到5号
+    | (zhYear Comma?)? ZhFrom? zhMonth Comma? ZhFrom? zhDay zhPeriodTo zhDay  # ZhPeriodMonthDayToMonthDay
+
+    | ZhFrom? zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
+    | ZhFrom? zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToTime
+    | ZhFrom? zhDateTime zhPeriodTo zhTime         # ZhPeriodDateTimeToTime
+    | ZhFrom? zhTime zhPeriodTo zhTime             # ZhPeriodTimeToTime
+    ;
+
+zhPeriodWeek
+    // e.g.: 3周后的周一到周五 | 周一到周五，三周后
+    : (
+        (zhNumberValue ZhWeekWord zhStepAliasMark Comma? ZhOf? zhWeekValue zhPeriodTo zhWeekValue)
+        | (ZhFrom? zhWeekValue zhPeriodTo zhWeekValue Comma? zhNumberValue ZhWeekWord zhStepAliasMark)
+      ) # ZhPeriodWeek_1
+    // e.g.: 下周一到下下周五 | 下周一到周五
+    | ZhFrom? zhAroundAliasMark zhWeekValue zhPeriodTo zhAroundAliasMark? zhWeekValue  # ZhPeriodWeek_2
     ;
 
 zhDateTime
-    : zhDate zhTime
+    // e.g.: 2021年7月1日， 3点15分
+    : zhDate Comma? zhTime
+    // e.g.: 3点15分，7月1号下午
+    | zhTime Comma? zhDate zhTimePeriodAliasMark?
     ;
 
 zhDate
     : zhDateAround
     | zhDateNormal
+    | stdDate
     ;
 
 zhDateNormal
-    : (yearValue ZhYearWord)? zhDateMonthDay
+    : zhMonthDay Comma? zhYear?
+    | zhYear Comma? zhMonthDay
+    | zhWeekDay
     ;
 
 zhDateAround
-    : zhAroundAliasMark ZhYearWord zhDateMonthDay                             # ZhDateYearAroundAlias
-    | zhAroundAliasMark ZhCountMonth zhDateDay                                # ZhDateMonthAroundAlias
-    | zhAroundAliasMark (ZhTian | ZhDayWord)                                  # ZhDateDayAroundAlias
-    | zhAroundAliasMark? (ZhWeekWord ZhOf)? ZhWeekWord zhWeekDayValue         # ZhDateWeekAroundAlias
-    | stepValue ZhYearWord zhAroundStepMark zhDateMonthDay                    # ZhDateYearAroundStep
-    | stepValue ZhCountMonth zhAroundStepMark zhDateDay                       # ZhDateMonthAroundStep
-    | stepValue (ZhTian | ZhDayWord) zhAroundStepMark                         # ZhDateDayAroundStep
-    | stepValue ZhWeekWord zhAroundStepMark ZhOf? ZhWeekWord zhWeekDayValue   # ZhDateWeekAroundStep
+    // e.g.: 明天, 大后天, 前天
+    : zhAroundAliasMark (ZhTian | ZhDayWord)   # ZhDateDayAroundAlias
+    // e.g.: 3天后
+    | zhNumberValue (ZhTian | ZhDayWord) zhStepAliasMark                         # ZhDateDayAroundStep
     ;
 
-zhDateMonthDay
-    : zhDateValue ZhMonthWord zhDateDay
+zhWeekDay
+    // e.g.: 下周五
+    : zhAroundAliasMark zhWeekValue
+    // e.g.: 三周后的周五
+    | zhNumberValue ZhWeekWord ZhAfterWord ZhOf? zhWeekValue
     ;
 
-zhDateDay
-    : zhDateValue zhMonthDayMark?
+zhMonthDay
+    : zhMonth zhDay
     ;
 
-zhWeekDayValue
-    : zhDateValue
-    | ZhDayWord
-    | ZhTian
+zhYear
+    // e.g.: 大前年, 去年
+    : zhAroundAliasMark ZhYearWord zhMonthDay
+    // e.g.: 3年前
+    | zhNumberValue ZhYearWord zhStepAliasMark
+    // 2021年 | 二零二一年
+    | zhYearValue ZhYearWord
     ;
 
-zhMonthDayMark
-    : ZhDayWord
-    | ZhDayWord_2
+zhMonth
+    // e.g.: 3月, 五月
+    : zhDateValue ZhMonthWord
+    // e.g.: 下个月, 上上月
+    | zhAroundAliasMark (ZhCountMonth | ZhMonthWord)
+    // e.g.: 3个月后
+    | zhNumberValue ZhCountMonth zhStepAliasMark
     ;
 
-zhAroundAliasMark
-    : ZhAroundWord
-    | ZhBeforeWord
-    | ZhAfterWord
+zhDay
+    : zhDateValue (ZhDayWord | ZhDayWord_2)?
     ;
 
 // time
 zhTime
     : zhTimeNormal
+    | stdTime
     ;
 
 zhTimeNormal
-    : zhTimePeriodAliasMark? zhDateValue zhHourMark zhDateValue zhMinuteMark? (zhDateValue zhSecondMark)?
+    //: e.g.: 上午3点20,
+    : zhTimePeriodAliasMark? zhDateValue zhHourMark ZhHourWholeWord? (zhDateValue zhMinuteMark? (zhDateValue zhSecondMark?)?)?
     ;
 
 zhTimePeriodAliasMark
@@ -286,9 +312,23 @@ zhSecondMark
 // time: direct means no date
 zhDirectTimeAround
     // e.g.: 三小时30分钟后
-    : zhDateValue ZhCountHour (zhDateValue ZhCountMinute)? zhAroundStepMark     # ZhTimeHourStep
+    : zhNumberValue ZhCountHour (zhNumberValue ZhCountMinute)? zhStepAliasMark     # ZhTimeHourStep
     // e.g.: 30分钟后
-    | zhDateValue ZhCountMinute zhAroundStepMark                                # ZhTimeMinuteStep
+    | zhNumberValue ZhCountMinute zhStepAliasMark                                # ZhTimeMinuteStep
+    ;
+
+zhNumberValue
+    : ZhValueWord
+    | numberValue
+    ;
+
+zhWeekValue
+    : ZhWeekWord (zhNumberValue | ZhTian | ZhDayWord)
+    ;
+
+zhYearValue
+    : ZhValueWord
+    | yearValue
     ;
 
 zhDateValue
@@ -296,8 +336,14 @@ zhDateValue
     | ZhValueWord
     ;
 
-zhAroundStepMark
+zhStepAliasMark
     : ZhBeforeWord
+    | ZhAfterWord
+    ;
+
+zhAroundAliasMark
+    : ZhAroundWord
+    | ZhBeforeWord
     | ZhAfterWord
     ;
 
@@ -310,20 +356,20 @@ zhAt
     : ZhAtWord
     ;
 
-// common
+//// common
 yearValue
     : YearNumber
     | DateNumber
     ;
 
-stepValue 
+numberValue 
     : YearNumber
     | DateNumber
     | NormalNumber
     ;
     
 
-// useless words
+//// useless words
 uselessWords
     : stdUselessWords
     | enUselessWords
@@ -375,6 +421,7 @@ zhUselessWords
     | ZhTian
     | ZhWeekWord
     | ZhHourWord
+    | ZhHourWholeWord
     | ZhCountHour
     | ZhMinuteWord
     | ZhCountMinute
@@ -383,4 +430,5 @@ zhUselessWords
     | ZhMorningWord
     | ZhAfternoonWord
     | ZhOf
+    | ZhFrom
     ;

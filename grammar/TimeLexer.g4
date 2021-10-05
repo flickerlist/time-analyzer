@@ -82,9 +82,27 @@ EnToWord              : T O;
 EnFrom                : F R O M;
 
 //// zh (cn && tw && hk)
-ZhValueWord           : ('一' | '二' | '三' | '四' | '五' | '六' | '七' | '八' | '九' | '十' | '廿')+;
-ZhAroundWord        : '这个' | '上上' | '上' | '本' | '这' | '這個' | '這' | '下下' | '下' // used for 'month, week'
-                    | '大前' | '大后' | '昨' | '去' | '今' | '明' | '大後'; // use for 'year, day'
+fragment ZHNUMBERVALUE
+    : '零' | '〇'
+    | '一' | '壹'
+    | '二' | '贰'
+    | '三' | '叁'
+    | '四' | '肆'
+    | '五' | '伍'
+    | '六' | '陆'
+    | '七' | '柒'
+    | '八' | '捌'
+    | '九' | '玖'
+    | '十' 
+    | '廿'
+    ;
+ZhValueWord           : ZHNUMBERVALUE+;
+ZhAroundWord
+    // used for 'month, week'
+    : '这个' | '上上' | '上' | '本' | '这' | '這個' | '這' | '下下' | '下' 
+    // use for 'year, day'
+    | '大前' | '大后' | '昨' | '去' | '今' | '明' | '大後'
+    ;
 ZhBeforeWord          : '前';
 ZhAfterWord           : '后' | '後';
 ZhOf                  : '的';
@@ -97,6 +115,7 @@ ZhDayWord_2           : '号' | '號';
 ZhTian                : '天';
 ZhWeekWord            : '周' | '个星期' | '星期';
 ZhHourWord            : '时' | '点' | '時' | '點';
+ZhHourWholeWord       : '整';
 ZhCountHour           : '个小时' | '小时' | '個小時' | '小時';
 ZhMinuteWord          : '分';
 ZhCountMinute         : '分钟' | '分鐘';
@@ -108,6 +127,7 @@ ZhAfternoonWord       : '下午' | '晚上';
 
 ZhToWord              : '至' | '到';
 ZhAtWord              : '于' | '在';
+ZhFrom                : '从';
 
 //// common
 YearNumber            : [1-9][0-9][0-9][0-9];
@@ -119,7 +139,7 @@ MiddelConnectorCurve  : '~';
 SlashConnectorWord    : '/';
 TimeConnectorWord     : ':';
 DateTimeConnectorWord : 'T';
-Comma                 : ',';
+Comma                 : ',' | '，';
 
 //// useless words
 NEWLINE : '\r'? '\n' -> skip;

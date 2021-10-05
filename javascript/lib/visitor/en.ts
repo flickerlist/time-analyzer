@@ -2,9 +2,8 @@ import { AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType } from 
 import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from "../model";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
-import { computedAroundTime, getCurrentYear, parseStepValue, parseYearValue } from "./std.utils";
+import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodToTime } from "./common.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
-import { parsePeriodToTime } from './common.utils';
 import { parseToInt } from '../utils/convert';
 
 export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
@@ -112,7 +111,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
 	visitEnPeriodWeek_1(ctx: EnPeriodWeek_1Context): AnalyzerValue {
-    let aroundValue = parseStepValue(ctx.stepValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
+    let aroundValue = parseNumberValueContext(ctx.numberValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
 
     const startDate = parseEnWeekValueToDate(
       parseEnWeekValue(ctx.EnWeekValue()[0]),
@@ -189,9 +188,8 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enDirectTimeAround
 
-  /// enTimeHourStep
   visitEnTimeHourStep (ctx: EnTimeHourStepContext): AnalyzerValue {
-    const values = ctx.stepValue().map((item) => parseStepValue(item));
+    const values = ctx.numberValue().map((item) => parseNumberValueContext(item));
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
         parseEnStepAliasMark(ctx.enStepAliasMark()),
@@ -201,12 +199,11 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
 
-  /// enTimeMinuteStep
   visitEnTimeMinuteStep(ctx: EnTimeMinuteStepContext): AnalyzerValue {
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
         parseEnStepAliasMark(ctx.enStepAliasMark()),
-        { minute: parseStepValue(ctx.stepValue()) },
+        { minute: parseNumberValueContext(ctx.numberValue()) },
       ),
       ctx,
     );
@@ -250,7 +247,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   /// EnDateDayAroundStep
   visitEnDateDayAroundStep(ctx: EnDateDayAroundStepContext): AnalyzerValue {
     const now = new Date();
-    const days = parseStepValue(ctx.stepValue());
+    const days = parseNumberValueContext(ctx.numberValue());
     const offsetType = parseEnStepAliasMark(ctx.enStepAliasMark());
     now.setDate(now.getDate() + days * offsetType);
     return AnalyzerDateValue.fromDateTime(now, ctx);
@@ -260,7 +257,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   visitEnDateWeekAroundStep(ctx: EnDateWeekAroundStepContext): AnalyzerValue {
     return parseEnWeekValueToDate(
       parseEnWeekValue(ctx.EnWeekValue()),
-      parseStepValue(ctx.stepValue())
+      parseNumberValueContext(ctx.numberValue())
         * parseEnStepAliasMark(ctx.enStepAliasMark()),
       ctx,
     );
@@ -289,11 +286,11 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         0,
       );
     }
-    if (ctx.stepValue()) {
+    if (ctx.numberValue()) {
       const offsetType = parseEnStepAliasMark(ctx.enStepAliasMark());
       
       return new AnalyzerDateValue(
-        getCurrentYear() + parseStepValue(ctx.stepValue()) * offsetType,
+        getCurrentYear() + parseNumberValueContext(ctx.numberValue()) * offsetType,
         -1,
         0,
       );
@@ -305,7 +302,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         0,
       );
     }
-    throw new Error('Never attach code');
+    throw new Error('Unexpected error');
   };
 
 	visitEnMonth(ctx: EnMonthContext): AnalyzerDateValue {
@@ -332,15 +329,15 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       );
     }
 
-    if (ctx.stepValue()) {
+    if (ctx.numberValue()) {
       const date = new Date();
-      date.setMonth(date.getMonth() + parseStepValue(ctx.stepValue()) * parseEnStepAliasMark(ctx.enStepAliasMark()));
+      date.setMonth(date.getMonth() + parseNumberValueContext(ctx.numberValue()) * parseEnStepAliasMark(ctx.enStepAliasMark()));
       return new AnalyzerDateValue(
         date.getFullYear(),
         date.getMonth(),
         0,
       );
     }
-    throw new Error('Never attach code');
+    throw new Error('Unexpected error');
   };
 }

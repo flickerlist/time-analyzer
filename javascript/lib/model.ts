@@ -4,9 +4,9 @@ import { ParserRuleContext } from "antlr4ts";
 export type StepOffsetType = -1 | 1 | 0;
 
 // last, this, next, the day before yesterday, 
-export type AroundValue = -2 | -1 | 0 | 1 | 2;
+export type AroundValue = -3 | -2 | -1 | 0 | 1 | 2 | 3;
 
-export type WeekValues = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export type WeekValues = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export enum AnalyzerValueType {
   Period = 'Period',

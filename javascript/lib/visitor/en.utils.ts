@@ -66,6 +66,41 @@ export function parseEnMonthValue(ctx: TerminalNode): -1 | number {
       return -1;
   }
 }
+
+// parse EnAroundWord
+export function parseEnAroundWord(ctx: TerminalNode | null): AroundValue {
+  if (!ctx) {
+    return 0;
+  }
+  switch (ctx.text.toUpperCase()) {
+    case 'OF THE FOLLOWING':
+    case 'NEXT':
+      return 1;
+    case 'LAST':
+      return -1;
+    case 'THIS':
+    default:
+      return 0;
+  }
+}
+
+// parse EnAroundDay
+export function parseEnAroundDayWord(ctx: TerminalNode): AroundValue {
+  switch(ctx.text.toUpperCase()) {
+    case 'THE DAY BEFORE YESTERDAY':
+      return -2;
+    case 'YESTERDAY':
+      return -1;
+    case 'TOMORROW':
+      return 1;
+    case 'THE DAY AFTER TOMORROW':
+      return 2;
+    case 'TODAY':
+    default:
+      return 0;
+  }
+}
+
 // parse EnWeekValue token
 export function parseEnWeekValue(ctx: TerminalNode): WeekValues {
   const text = ctx.text.toUpperCase();
@@ -105,42 +140,8 @@ export function parseEnWeekValue(ctx: TerminalNode): WeekValues {
   return parseWeekDay_startAtSunday(value);
 }
 
-// parse EnAroundWord
-export function parseEnAroundWord(ctx: TerminalNode | null): AroundValue {
-  if (!ctx) {
-    return 0;
-  }
-  switch (ctx.text.toUpperCase()) {
-    case 'OF THE FOLLOWING':
-    case 'NEXT':
-      return 1;
-    case 'LAST':
-      return -1;
-    case 'THIS':
-    default:
-      return 0;
-  }
-}
-
-// parse EnAroundDay
-export function parseEnAroundDayWord(ctx: TerminalNode): AroundValue {
-  switch(ctx.text.toUpperCase()) {
-    case 'THE DAY BEFORE YESTERDAY':
-      return -2;
-    case 'YESTERDAY':
-      return -1;
-    case 'TOMORROW':
-      return 1;
-    case 'THE DAY AFTER TOMORROW':
-      return 2;
-    case 'TODAY':
-    default:
-      return 0;
-  }
-}
-
 /**
- * 
+ * parse week value to date
  * @param targetWeekDay Mon. -> 1, Sunday -> 0
  * @param offsetWeeks This week -> 0, last week -> -1, two week later -> 2
  * @returns AnalyzerDateValue

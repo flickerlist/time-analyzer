@@ -1,5 +1,5 @@
 import { parseEnWeekValueToDate } from '@/lib/visitor/en.utils';
-import { getCurrentYear } from '@/lib/visitor/std.utils';
+import { getCurrentYear } from '@/lib/visitor/common.utils';
 import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
 
 describe('En Period Time', () => {

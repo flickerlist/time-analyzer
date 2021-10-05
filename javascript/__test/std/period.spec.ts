@@ -1,4 +1,4 @@
-import { getCurrentYear } from '@/lib/visitor/std.utils';
+import { getCurrentYear } from '@/lib/visitor/common.utils';
 import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
 
 describe('Standard Period', () => {
