@@ -68,9 +68,9 @@ stdPeriodTo
 //// en
 enPeriod
     : enPeriodWeek                                              # EnPeriodWeekDayNode 
-    // e.g.: March 3rd-5th, 2002 | March 3-5, 2002 | March 3rd to 5th, 2002 | 3rd to 5th of next month | next month, on the 3-5
+    // e.g.: March 3rd-5th, 2002 | March 3-5, 2002 | March 3rd to 5th, 2002 | 3rd to 5th of next month | next month, on the 3-5 | March 5 to April 5, 2022 | March 5 to April 5, next year
     | EnFrom? (
-        (enMonth Comma? enAt? enDay enPeriodTo enDay)
+        (enMonth Comma? enAt? enDay enPeriodTo enMonth? enDay)
         | (enDay enPeriodTo enDay Comma? enAt? enMonth)
       ) Comma? enAt? enYear?  # EnPeriodMonthDayToMonthDay
     
@@ -201,8 +201,8 @@ enAt
 //// zh
 zhPeriod
     : zhPeriodWeek                         # ZhPeriodWeekDayNode
-    // e.g.: 从下个月3号到五号 | 3个月后，从3号到五号 | 3月3号到5号
-    | (zhYear Comma?)? ZhFrom? zhMonth Comma? ZhFrom? zhDay zhPeriodTo zhDay  # ZhPeriodMonthDayToMonthDay
+    // e.g.: 从下个月3号到五号 | 明年7月3号到五号 | 3个月后，从3号到五号 | 3月3号到5号 | 明年7月3号到七月五号 | 3年后，7月3号到七月五号
+    | (zhYear Comma?)? ZhFrom? zhMonth Comma? ZhFrom? zhDay zhPeriodTo zhMonth? zhDay  # ZhPeriodMonthDayToMonthDay
 
     | ZhFrom? zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
     | ZhFrom? zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToDateTime
