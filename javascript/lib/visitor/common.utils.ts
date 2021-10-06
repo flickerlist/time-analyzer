@@ -77,7 +77,8 @@ export function getCurrentYear(): number {
  * computed date abount around values, such as:
  *    3 days later, after 2 hours
  */
-export function computedAroundTime(offsetType: StepOffsetType, {
+export function computedAroundTime(
+  offsetType: StepOffsetType, {
   year,
   month,
   week,

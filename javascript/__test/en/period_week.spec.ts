@@ -1,10 +1,7 @@
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType, WeekValues, AnalyzerDateValue, AnalyzerValue } from '@/lib/index';
+import { TimeAnalyzer, WeekStartDay, WeekValues } from '@/lib/index';
+import { convertWeekDay } from '@/lib/visitor/common.utils';
 import { parseEnWeekValueToDate } from '@/lib/visitor/en.utils';
-
-interface DatePeriod {
-  start: AnalyzerDateValue;
-  end: AnalyzerDateValue;
-}
+import { DatePeriod, expectWeekPeriod } from '../utils';
 
 function getWeekPeriod(
   start: WeekValues,
@@ -12,42 +9,20 @@ function getWeekPeriod(
   offsetWeeks: number,
   endOffsetWeeks?: number,
 ): DatePeriod {
-  const startDateValue = parseEnWeekValueToDate(start, offsetWeeks);
-  const endDateValue = parseEnWeekValueToDate(end, typeof endOffsetWeeks === 'undefined'? offsetWeeks : endOffsetWeeks);
+  const startDateValue = parseEnWeekValueToDate(
+    convertWeekDay(start, WeekStartDay.Sunday),
+    offsetWeeks,
+  );
+  const endDateValue = parseEnWeekValueToDate(
+    convertWeekDay(end, WeekStartDay.Sunday),
+    typeof endOffsetWeeks === 'undefined'? offsetWeeks : endOffsetWeeks,
+  );
   return {
     start:startDateValue,
     end: endDateValue,
   }
 }
 
-function expectWeekPeriod(
-  value: AnalyzerValue,
-  datePeriod: DatePeriod,
-  matchText: string,
-  matchStart = 0,
-) {
-  expect(value).toMatchObject({
-    valueType: AnalyzerValueType.Period,
-    periodType: AnalyzerPeriodValueType.Date,
-    start: {
-      valueType: datePeriod.start.valueType,
-      year: datePeriod.start.year,
-      month: datePeriod.start.month,
-      day: datePeriod.start.day,
-    },
-    end: {
-      valueType: datePeriod.start.valueType,
-      year: datePeriod.end.year,
-      month: datePeriod.end.month,
-      day: datePeriod.end.day,
-    },
-    match: {
-      startIndex: matchStart,
-      endIndex: matchStart + matchText.length,
-      text: matchText,
-    },
-  });
-}
 
 describe('En Period Week', () => {
 

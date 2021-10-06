@@ -1,89 +1,65 @@
 import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
+import { expectDateTime, expectTime } from '../utils';
 
 describe('En Time', () => {
 
   test('Time', () => {
-    const values = new TimeAnalyzer('1pm').values;
-
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Time,
+    expectTime({
+      text: '1pm',
       hour: 13,
       minute: 0,
       second: 0,
-      match: {
-        startIndex: 0,
-        endIndex: 3,
-        text: '1pm',
-      },
     });
   });
 
   test('Time', () => {
-    const values = new TimeAnalyzer('at 5:30 p.m').values;
-
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Time,
+    expectTime({
+      text: 'at 5:30 p.m',
       hour: 17,
       minute: 30,
       second: 0,
-      match: {
-        startIndex: 0,
-        endIndex: 11,
-        text: 'at 5:30 p.m',
-      },
     });
   });
 
   test('Time', () => {
-    const values = new TimeAnalyzer('at 8 at night').values;
-
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Time,
+    expectTime({
+      text: 'at 8 at night',
       hour: 20,
       minute: 0,
       second: 0,
-      match: {
-        startIndex: 0,
-        endIndex: 13,
-        text: 'at 8 at night',
-      },
     });
   });
 
   test('Time', () => {
-    const values = new TimeAnalyzer('at 3:30:30 in the afternoon').values;
-
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Time,
+    expectTime({
+      text: 'at 3:30:30 in the afternoon',
       hour: 15,
       minute: 30,
       second: 30,
-      match: {
-        startIndex: 0,
-        endIndex: 27,
-        text: 'at 3:30:30 in the afternoon',
-      },
     });
   });
 
   test('Time', () => {
-    const values = new TimeAnalyzer('12:30 at noon').values;
-
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Time,
+    expectTime({
+      text: '12:30 at noon',
       hour: 12,
       minute: 30,
       second: 0,
-      match: {
-        startIndex: 0,
-        endIndex: 13,
-        text: '12:30 at noon',
-      },
+    });
+  });
+
+  test('DirectTimeAround', () => {
+    expectDateTime({
+      text: 'after 3 hours and 30 minutes',
+      addHours: 3,
+      addMinutes: 30,
+    });
+  });
+
+  test('DirectTimeAround', () => {
+    expectDateTime({
+      text: '300 hours before',
+      addHours: -300,
     });
   });
   

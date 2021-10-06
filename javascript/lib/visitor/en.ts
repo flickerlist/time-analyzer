@@ -59,23 +59,25 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
 	visitEnPeriodMonthDayToMonthDay (ctx: EnPeriodMonthDayToMonthDayContext): AnalyzerValue {
-    const month = this.visit(ctx.enMonth()) as AnalyzerDateValue;
+    const months = ctx.enMonth().map((item) => this.visit(item) as AnalyzerDateValue);
     if (ctx.enYear()) {
       const year = this.visit(ctx.enYear()) as AnalyzerDateValue;
-      month.year = year.year;
+      months.map((item) => item.year = year.year);
     }
+    const start = months[0];
+    const end = months[1] || start;
     const startDay = parseEnDay(ctx.enDay()[0]);
     const endDay = parseEnDay(ctx.enDay()[1]);
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
       new AnalyzerDateValue(
-        month.year,
-        month.month,
+        start.year,
+        start.month,
         startDay,
       ),
       new AnalyzerDateValue(
-        month.year,
-        month.month,
+        end.year,
+        end.month,
         endDay,
       ),
       ctx,

@@ -1,5 +1,5 @@
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { ZhAroundAliasMarkContext, ZhDateValueContext, ZhDayContext, ZhNumberValueContext, ZhStepAliasMarkContext, ZhYearValueContext, ZhWeekValueContext } from "../grammar/TimeParser";
+import { ZhAroundAliasMarkContext, ZhDateValueContext, ZhDayContext, ZhNumberValueContext, ZhStepAliasMarkContext, ZhYearValueContext, ZhWeekValueContext, ZhTimeContext } from "../grammar/TimeParser";
 import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekStartDay, WeekValues } from "../model";
 import * as Nzh from 'nzh';
 import { parseToInt } from '../utils/convert';
@@ -12,6 +12,22 @@ export function parseZhYearValue(zhYearValue: ZhYearValueContext): number {
     return parseYearValue(zhYearValue.yearValue());
   }
   return parseZhValueWord(zhYearValue.ZhValueWord()) || getCurrentYear();
+}
+
+// time has perioldAliasMark
+export function zhTimeHasPerioldAliasMark(zhTime: ZhTimeContext): boolean {
+  if (!zhTime.zhTimeNormal() || !zhTime.zhTimeNormal().zhTimePeriodAliasMark()) {
+    return false;
+  }
+  return true;
+}
+
+// time is afternoon (add 12 to hour)
+export function zhTimeIsAfternoon(zhTime: ZhTimeContext): boolean {
+  if (!zhTimeHasPerioldAliasMark(zhTime)) {
+    return false;
+  }
+  return !!zhTime.zhTimeNormal().zhTimePeriodAliasMark().ZhAfternoonWord();
 }
 
 // parse zhStepAliasMark
@@ -40,7 +56,10 @@ export function parseZhDateValue(zhDateValue: ZhDateValueContext) {
 
 // parse zhDay context
 export function parseZhDay(ctx: ZhDayContext): number {
-  return parseToInt(ctx.zhDateValue().DateNumber().text, 0);
+  if (ctx.zhDateValue().DateNumber()) {
+    return parseToInt(ctx.zhDateValue().DateNumber().text, 0);
+  }
+  return parseZhValueWord(ctx.zhDateValue().ZhValueWord());
 }
 
 // parse zhAroundAliasMark

@@ -1,10 +1,129 @@
 import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
+import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer, WeekStartDay } from '@/lib/index';
 
-describe('En Period Date', () => {
+describe('Zh Period Date', () => {
 
-  test('Period', () => {
-    const values = new TimeAnalyzer('March 3-5, 2002').values;
+  test('Period Date', () => {
+    const text = '7月1日至明年8月1日';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(1);
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear(),
+        month: 6,
+        day: 1,
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 1,
+        month: 7,
+        day: 1,
+      },
+      match: {
+        startIndex: 0,
+        endIndex: text.length,
+        text: text,
+      },
+    });
+  });
+
+  test('Period Date', () => {
+    const text = '明年7月1日至8月1日';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(1);
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 1,
+        month: 6,
+        day: 1,
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 1,
+        month: 7,
+        day: 1,
+      },
+      match: {
+        startIndex: 0,
+        endIndex: text.length,
+        text: text,
+      },
+    });
+  });
+
+  test('Period Date', () => {
+    const text = '明天到大后天';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(1);
+
+    const startDate = new Date();
+    const endDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+    endDate.setDate(endDate.getDate() + 3);
+
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: startDate.getFullYear(),
+        month: startDate.getMonth(),
+        day: startDate.getDate(),
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: endDate.getFullYear(),
+        month: endDate.getMonth(),
+        day: endDate.getDate(),
+      },
+      match: {
+        startIndex: 0,
+        endIndex: text.length,
+        text: text,
+      },
+    });
+  });
+
+  test('Period Date', () => {
+    const text = '明天到后年7月1号';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(1);
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: startDate.getFullYear(),
+        month: startDate.getMonth(),
+        day: startDate.getDate(),
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 2,
+        month: 6,
+        day: 1,
+      },
+      match: {
+        startIndex: 0,
+        endIndex: text.length,
+        text: text,
+      },
+    });
+  });
+
+  test('Period Date', () => {
+    const text = '2002年3月3-5日';
+    const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Period,
@@ -23,66 +142,15 @@ describe('En Period Date', () => {
       },
       match: {
         startIndex: 0,
-        endIndex: 15,
-        text: 'March 3-5, 2002',
+        endIndex: text.length,
+        text: text,
       },
     });
   });
 
-  test('Period', () => {
-    const values = new TimeAnalyzer('March 3rd-5th, 2002').values;
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
-      start: {
-        valueType: AnalyzerValueType.Date,
-        year: 2002,
-        month: 2,
-        day: 3,
-      },
-      end: {
-        valueType: AnalyzerValueType.Date,
-        year: 2002,
-        month: 2,
-        day: 5,
-      },
-      match: {
-        startIndex: 0,
-        endIndex: 19,
-        text: 'March 3rd-5th, 2002',
-      },
-    });
-  });
-
-  test('Period', () => {
-    const values = new TimeAnalyzer('March 3rd to 5th, 2002').values;
-    expect(values).toHaveLength(1);
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
-      start: {
-        valueType: AnalyzerValueType.Date,
-        year: 2002,
-        month: 2,
-        day: 3,
-      },
-      end: {
-        valueType: AnalyzerValueType.Date,
-        year: 2002,
-        month: 2,
-        day: 5,
-      },
-      match: {
-        startIndex: 0,
-        endIndex: 22,
-        text: 'March 3rd to 5th, 2002',
-      },
-    });
-  });
-
-  test('Period', () => {
-    const values = new TimeAnalyzer('March 3 to 5').values;
+  test('Period Date', () => {
+    const text = '3月3日至5日';
+    const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Period,
@@ -101,102 +169,14 @@ describe('En Period Date', () => {
       },
       match: {
         startIndex: 0,
-        endIndex: 12,
-        text: 'March 3 to 5',
-      },
-    });
-  });
-
-  test('Period', () => {
-    const values = new TimeAnalyzer('3rd to 5th of next month').values;
-    expect(values).toHaveLength(1);
-
-    const date = new Date();
-    date.setMonth(date.getMonth() + 1);
-
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
-      start: {
-        valueType: AnalyzerValueType.Date,
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: 3,
-      },
-      end: {
-        valueType: AnalyzerValueType.Date,
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: 5,
-      },
-      match: {
-        startIndex: 0,
-        endIndex: 24,
-        text: '3rd to 5th of next month',
-      },
-    });
-  });
-
-  test('Period', () => {
-    const values = new TimeAnalyzer('next month, on the 3-5').values;
-    expect(values).toHaveLength(1);
-
-    const date = new Date();
-    date.setMonth(date.getMonth() + 1);
-
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
-      start: {
-        valueType: AnalyzerValueType.Date,
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: 3,
-      },
-      end: {
-        valueType: AnalyzerValueType.Date,
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        day: 5,
-      },
-      match: {
-        startIndex: 0,
-        endIndex: 22,
-        text: 'next month, on the 3-5',
-      },
-    });
-  });
-
-  test('Period', () => {
-    const text = 'March 5 to April 5, 2022';
-    const values = new TimeAnalyzer(text).values;
-    expect(values).toHaveLength(1);
-
-    expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
-      start: {
-        valueType: AnalyzerValueType.Date,
-        year: 2022,
-        month: 2,
-        day: 5,
-      },
-      end: {
-        valueType: AnalyzerValueType.Date,
-        year: 2022,
-        month: 3,
-        day: 5,
-      },
-      match: {
-        startIndex: 0,
         endIndex: text.length,
-        text,
+        text: text,
       },
     });
   });
 
-  test('Period', () => {
-    const text = 'March 5 to April 5, next year';
+  test('Period Date', () => {
+    const text = '明年7月3号到七月五号';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
 
@@ -206,49 +186,75 @@ describe('En Period Date', () => {
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 1,
-        month: 2,
-        day: 5,
+        month: 6,
+        day: 3,
       },
       end: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 1,
-        month: 3,
+        month: 6,
         day: 5,
       },
       match: {
         startIndex: 0,
         endIndex: text.length,
-        text,
+        text: text,
       },
     });
   });
 
-  test('Period', () => {
-    const text = 'March 5 to April 5, 3 years later';
+  test('Period Date', () => {
+    const text = '2022年7月3号到七月五号';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: 2022,
+        month: 6,
+        day: 3,
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: 2022,
+        month: 6,
+        day: 5,
+      },
+      match: {
+        startIndex: 0,
+        endIndex: text.length,
+        text: text,
+      },
+    });
+  });
 
+  test('Period Date', () => {
+    const text = '3年后，7月3号到七月五号';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
       valueType: AnalyzerValueType.Period,
       periodType: AnalyzerPeriodValueType.Date,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 3,
-        month: 2,
-        day: 5,
+        month: 6,
+        day: 3,
       },
       end: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 3,
-        month: 3,
+        month: 6,
         day: 5,
       },
       match: {
         startIndex: 0,
         endIndex: text.length,
-        text,
+        text: text,
       },
     });
   });
-
+  
 });

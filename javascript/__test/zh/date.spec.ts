@@ -46,6 +46,21 @@ describe('Zh Date', () => {
     });
   });
 
+  test('Date', () => {
+    expectDate({
+      text: '今天',
+      addDays: 0,
+    });
+  });
+
+  test('Date Week', () => {
+    expectDate({
+      text: '周日',
+      weekDay: 0,
+      weekStart: WeekStartDay.Monday,
+    });
+  });
+
   test('Date Week', () => {
     expectDate({
       text: '本周五',
@@ -91,19 +106,53 @@ describe('Zh Date', () => {
 
   test('Date Week', () => {
     expectDate({
-      text: '周日',
-      weekDay: 0,
+      text: '下周六',
+      fullText: '那下周六我们去打网球',
+      weekDay: 6,
+      addWeeks: 1,
       weekStart: WeekStartDay.Monday,
     });
   });
 
   test('Date Week', () => {
     expectDate({
-      text: '下周六',
-      fullText: '那下周六我们去打网球',
-      weekDay: 6,
-      addWeeks: 1,
+      text: '3个星期后的周五',
+      weekDay: 5,
+      addWeeks: 3,
       weekStart: WeekStartDay.Monday,
+    });
+  });
+
+  test('Date Week', () => {
+    expectDate({
+      text: '3周前周五',
+      weekDay: 5,
+      addWeeks: -3,
+      weekStart: WeekStartDay.Monday,
+    });
+  });
+
+  test('Date Around', () => {
+    expectDate({
+      text: '2年后3月5号',
+      addYears: 2,
+      month: 2,
+      day: 5,
+    });
+  });
+
+  test('Date Around', () => {
+    expectDate({
+      text: '3个月后10号',
+      addMonths: 3,
+      day: 10,
+    });
+  });
+
+  test('Date Around', () => {
+    expectDate({
+      text: '3天后',
+      addDays: 3,
     });
   });
   
