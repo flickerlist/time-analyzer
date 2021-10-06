@@ -1,5 +1,5 @@
-import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
-import { parseWeekDay_startAtSunday, getCurrentYear } from '@/lib/visitor/common.utils';
+import { TimeAnalyzer, AnalyzerValueType, WeekValues } from '@/lib/index';
+import { convertWeekDay, getCurrentYear } from '@/lib/visitor/common.utils';
 
 describe('En DateTime', () => {
 
@@ -63,9 +63,9 @@ describe('En DateTime', () => {
   test('DateTime', () => {
     const values = new TimeAnalyzer('at 5:50 on Saturday afternoon').values;
 
-    const targetWeekDay = parseWeekDay_startAtSunday(6);
+    const targetWeekDay = convertWeekDay(6);
     const date = new Date();
-    date.setDate(date.getDate() + targetWeekDay - parseWeekDay_startAtSunday(date.getDay()));
+    date.setDate(date.getDate() + targetWeekDay - convertWeekDay(date.getDay() as WeekValues));
 
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({

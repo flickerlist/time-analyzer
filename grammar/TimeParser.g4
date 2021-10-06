@@ -205,7 +205,7 @@ zhPeriod
     | (zhYear Comma?)? ZhFrom? zhMonth Comma? ZhFrom? zhDay zhPeriodTo zhDay  # ZhPeriodMonthDayToMonthDay
 
     | ZhFrom? zhDate zhPeriodTo zhDate             # ZhPeriodDateToDate
-    | ZhFrom? zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToTime
+    | ZhFrom? zhDateTime zhPeriodTo zhDateTime     # ZhPeriodDateTimeToDateTime
     | ZhFrom? zhDateTime zhPeriodTo zhTime         # ZhPeriodDateTimeToTime
     | ZhFrom? zhTime zhPeriodTo zhTime             # ZhPeriodTimeToTime
     ;
@@ -234,8 +234,8 @@ zhDate
     ;
 
 zhDateNormal
-    : zhMonthDay Comma? zhYear?
-    | zhYear Comma? zhMonthDay
+    : zhYear Comma? zhMonthDay
+    | zhMonthDay Comma? zhYear?
     | zhWeekDay
     ;
 
@@ -247,10 +247,10 @@ zhDateAround
     ;
 
 zhWeekDay
-    // e.g.: 下周五
-    : zhAroundAliasMark zhWeekValue
     // e.g.: 三周后的周五
-    | zhNumberValue ZhWeekWord ZhAfterWord ZhOf? zhWeekValue
+    : zhNumberValue ZhWeekWord zhStepAliasMark ZhOf? zhWeekValue
+    // e.g.: 下周五
+    | zhAroundAliasMark? ZhWeekWord? ZhOf? zhWeekValue
     ;
 
 zhMonthDay
@@ -259,7 +259,7 @@ zhMonthDay
 
 zhYear
     // e.g.: 大前年, 去年
-    : zhAroundAliasMark ZhYearWord zhMonthDay
+    : zhAroundAliasMark ZhYearWord
     // e.g.: 3年前
     | zhNumberValue ZhYearWord zhStepAliasMark
     // 2021年 | 二零二一年
@@ -287,26 +287,7 @@ zhTime
 
 zhTimeNormal
     //: e.g.: 上午3点20,
-    : zhTimePeriodAliasMark? zhDateValue zhHourMark ZhHourWholeWord? (zhDateValue zhMinuteMark? (zhDateValue zhSecondMark?)?)?
-    ;
-
-zhTimePeriodAliasMark
-    : ZhAfternoonWord
-    | ZhMorningWord
-    ;
-
-zhHourMark
-    : ZhHourWord
-    | TimeConnectorWord
-    ;
-
-zhMinuteMark
-    : ZhMinuteWord
-    | TimeConnectorWord
-    ;
-
-zhSecondMark
-    : ZhSecondWord
+    : zhTimePeriodAliasMark? zhNumberValue zhHourMark ZhHourWholeWord? (zhNumberValue zhMinuteMark? (zhNumberValue zhSecondMark?)?)?
     ;
 
 // time: direct means no date
@@ -336,6 +317,7 @@ zhDateValue
     | ZhValueWord
     ;
 
+// marks
 zhStepAliasMark
     : ZhBeforeWord
     | ZhAfterWord
@@ -345,6 +327,25 @@ zhAroundAliasMark
     : ZhAroundWord
     | ZhBeforeWord
     | ZhAfterWord
+    ;
+
+zhTimePeriodAliasMark
+    : ZhAfternoonWord
+    | ZhMorningWord
+    ;
+
+zhHourMark
+    : ZhHourWord
+    | TimeConnectorWord
+    ;
+
+zhMinuteMark
+    : ZhMinuteWord
+    | TimeConnectorWord
+    ;
+
+zhSecondMark
+    : ZhSecondWord
     ;
 
 zhPeriodTo

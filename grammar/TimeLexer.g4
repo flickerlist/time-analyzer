@@ -105,7 +105,6 @@ ZhAroundWord
     ;
 ZhBeforeWord          : '前';
 ZhAfterWord           : '后' | '後';
-ZhOf                  : '的';
 
 ZhYearWord            : '年';
 ZhMonthWord           : '月';
@@ -127,6 +126,7 @@ ZhAfternoonWord       : '下午' | '晚上';
 
 ZhToWord              : '至' | '到';
 ZhAtWord              : '于' | '在';
+ZhOf                  : '的';
 ZhFrom                : '从';
 
 //// common

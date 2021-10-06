@@ -1,6 +1,5 @@
-import { AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType } from './../model';
+import { AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerUnexpectedError, AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from '../model';
 import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext } from "../grammar/TimeParser";
-import { AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from "../model";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
 import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodToTime } from "./common.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
@@ -82,6 +81,25 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       ctx,
     );
   };
+	visitEnPeriodWeek_1(ctx: EnPeriodWeek_1Context): AnalyzerValue {
+    let aroundValue = parseNumberValueContext(ctx.numberValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
+
+    const startDate = parseEnWeekValueToDate(
+      parseEnWeekValue(ctx.EnWeekValue()[0]),
+      aroundValue,
+    );
+    const endDate = parseEnWeekValueToDate(
+      parseEnWeekValue(ctx.EnWeekValue()[1]),
+      aroundValue,
+    );
+    
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.Date,
+      startDate,
+      endDate,
+      ctx,
+    );
+  };
   visitEnPeriodWeek_2(ctx: EnPeriodWeek_2Context): AnalyzerValue {
 
     let startAroundValue = 0;
@@ -103,25 +121,6 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       endAroundValue,
     );
 
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
-      startDate,
-      endDate,
-      ctx,
-    );
-  };
-	visitEnPeriodWeek_1(ctx: EnPeriodWeek_1Context): AnalyzerValue {
-    let aroundValue = parseNumberValueContext(ctx.numberValue()) * parseEnStepAliasMark(ctx.enStepAliasMark());
-
-    const startDate = parseEnWeekValueToDate(
-      parseEnWeekValue(ctx.EnWeekValue()[0]),
-      aroundValue,
-    );
-    const endDate = parseEnWeekValueToDate(
-      parseEnWeekValue(ctx.EnWeekValue()[1]),
-      aroundValue,
-    );
-    
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
       startDate,
@@ -302,7 +301,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         0,
       );
     }
-    throw new Error('Unexpected error');
+    throw new AnalyzerUnexpectedError();
   };
 
 	visitEnMonth(ctx: EnMonthContext): AnalyzerDateValue {
@@ -338,6 +337,6 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         0,
       );
     }
-    throw new Error('Unexpected error');
+    throw new AnalyzerUnexpectedError();
   };
 }

@@ -1,10 +1,10 @@
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ZhAroundAliasMarkContext, ZhDateValueContext, ZhDayContext, ZhNumberValueContext, ZhStepAliasMarkContext, ZhYearValueContext, ZhWeekValueContext } from "../grammar/TimeParser";
-import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekValues } from "../model";
+import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekStartDay, WeekValues } from "../model";
 import * as Nzh from 'nzh';
 import { parseToInt } from '../utils/convert';
 import { ParserRuleContext } from 'antlr4ts';
-import { parseNumberValueContext, parseWeekDay_startAtMonday, parseYearValue, getCurrentYear } from './common.utils';
+import { parseNumberValueContext, parseYearValue, getCurrentYear, convertWeekDay } from './common.utils';
 
 // parse yearValue
 export function parseZhYearValue(zhYearValue: ZhYearValueContext): number {
@@ -23,7 +23,7 @@ export function parseZhStepAliasMark(zhStepAliasMark: ZhStepAliasMarkContext): S
 }
 
 // parse zhStepValue
-export function parseZhNumberValueContext(zhNumberValue: ZhNumberValueContext) {
+export function parseZhNumberValue(zhNumberValue: ZhNumberValueContext) {
   if (zhNumberValue.numberValue()) {
     return parseNumberValueContext(zhNumberValue.numberValue());
   }
@@ -81,7 +81,7 @@ export function parseZhAroundAliasMark(ctx: ZhAroundAliasMarkContext): AroundVal
 export function parseZhWeekValue(zhWeekValue: ZhWeekValueContext): WeekValues | -1 {
   let result = -1;
   if (zhWeekValue.zhNumberValue()) {
-    result = parseZhNumberValueContext(zhWeekValue.zhNumberValue());
+    result = parseZhNumberValue(zhWeekValue.zhNumberValue());
   } else if (zhWeekValue.ZhTian() || zhWeekValue.ZhDayWord()){
     result = 7;
   }
@@ -105,7 +105,7 @@ export function parseZhWeekValueToDate(
   const now = new Date();
   now.setDate(
     now.getDate()
-    + targetWeekValue - parseWeekDay_startAtMonday(now.getDay() as WeekValues)
+    + targetWeekValue - convertWeekDay(now.getDay() as WeekValues, WeekStartDay.Monday)
     + offsetWeeks * 7
   );
   return AnalyzerDateValue.fromDateTime(now, ctx);
@@ -114,7 +114,7 @@ export function parseZhWeekValueToDate(
 // parse ZhValueWord
 export function parseZhValueWord(ctx: TerminalNode): number | null {
   let text = ctx.text;
-  if (text.indexOf('廿')) {
+  if (text.indexOf('廿') > -1) {
     text = text.replace('廿', '');
     let value = parseZhValue(text);
     if (1 <= value && value <= 9) {

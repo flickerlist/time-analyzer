@@ -1,5 +1,5 @@
 import { ParserRuleContext } from "antlr4ts";
-import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues, StepOffsetType } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues, StepOffsetType, AnalyzerUnexpectedError, WeekStartDay } from "../model";
 import { NumberValueContext, YearValueContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
 
@@ -26,19 +26,18 @@ export function parsePeriodToTime(
   );
 }
 
-// parse week day (start at monday, such in chinese)
-export function parseWeekDay_startAtMonday(originWeekDay: WeekValues): WeekValues {
-  if (originWeekDay === 0) {
-    return 7;
+// parse week day 
+export function convertWeekDay(
+  originWeekDay: WeekValues,
+  weekStart: WeekStartDay = WeekStartDay.Sunday,
+): WeekValues {
+  if (weekStart === WeekStartDay.Monday) {
+    if (originWeekDay === 0) {
+      return 7;
+    }
   }
   return originWeekDay;
 }
-
-// parse week day (start at sunday, such in usa)
-export function parseWeekDay_startAtSunday(originWeekDay: number): WeekValues {
-  return originWeekDay as WeekValues;
-}
-
 
 // parse yearValue
 export function parseYearValue(yearValue: YearValueContext): number {
@@ -49,7 +48,7 @@ export function parseYearValue(yearValue: YearValueContext): number {
     const yearSuffix = parseToInt(yearValue.DateNumber().text);
     return fillYearNumber(yearSuffix);
   }
-  throw new Error('Unexpected error');
+  throw new AnalyzerUnexpectedError();
 }
 
 /**

@@ -8,6 +8,12 @@ export type AroundValue = -3 | -2 | -1 | 0 | 1 | 2 | 3;
 
 export type WeekValues = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
+// week start: Sunday or Monday
+export enum WeekStartDay {
+  Sunday = 'Sunday',
+  Monday = 'Monday', // start at monday, such in chinese
+}
+
 export enum AnalyzerValueType {
   Period = 'Period',
   DateTime = 'DateTime',
@@ -237,4 +243,10 @@ export class AnalyzerValueArray extends AnalyzerValue {
   }
 
   values: AnalyzerValue[];
+}
+
+export class AnalyzerUnexpectedError extends Error {
+  constructor() {
+    super('Unexpected error');
+  }
 }

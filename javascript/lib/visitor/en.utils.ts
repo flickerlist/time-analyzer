@@ -1,9 +1,9 @@
-import { parseWeekDay_startAtSunday } from './common.utils';
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { EnDayContext, EnStepAliasMarkContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
 import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekValues } from '../model';
 import { ParserRuleContext } from 'antlr4ts';
+import { convertWeekDay } from "./common.utils";
 
 // parse around mark (before, after, ago ...)
 export function parseEnStepAliasMark(mark: EnStepAliasMarkContext): StepOffsetType {
@@ -135,9 +135,9 @@ export function parseEnWeekValue(ctx: TerminalNode): WeekValues {
       value =  0;
       break;
     default:
-      throw new Error('parse english week value error');
+      throw new Error('Unexpected error');
   }
-  return parseWeekDay_startAtSunday(value);
+  return convertWeekDay(value);
 }
 
 /**
@@ -154,7 +154,7 @@ export function parseEnWeekValueToDate(
   const now = new Date();
   now.setDate(
     now.getDate()
-    + targetWeekValue - parseWeekDay_startAtSunday(now.getDay())
+    + targetWeekValue - convertWeekDay(now.getDay() as WeekValues)
     + offsetWeeks * 7
   );
   return AnalyzerDateValue.fromDateTime(now, ctx);

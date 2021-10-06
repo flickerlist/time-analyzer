@@ -1,48 +1,157 @@
-import { ZhDateAroundContext, ZhDateContext, ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhDateValueContext, ZhDayContext, ZhHourMarkContext, ZhMinuteMarkContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodContext, ZhPeriodWeekContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhSecondMarkContext, ZhStepAliasMarkContext, ZhTimeContext, ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhTimeNormalContext, ZhTimePeriodAliasMarkContext, ZhWeekDayContext, ZhYearContext, ZhNumberValueContext } from "../grammar/TimeParser";
-import { AnalyzerDateValue, AnalyzerValue } from "../model";
+import { ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhTimeNormalContext, ZhWeekDayContext, ZhYearContext, ZhPeriodDateToDateContext, ZhPeriodDateTimeToDateTimeContext, ZhPeriodDateTimeToTimeContext, ZhPeriodTimeToTimeContext } from "../grammar/TimeParser";
+import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, AnalyzerUnexpectedError, AnalyzerValue, WeekValues } from "../model";
 import { StdTimeAnalyzerVisitor } from "./std";
-import { getCurrentYear } from "./common.utils";
-import { parseZhAroundAliasMark, parseZhDateValue, parseZhDay, parseZhNumberValueContext, parseZhStepAliasMark, parseZhYearValue } from "./zh.utils";
+import { computedAroundTime, getCurrentYear } from "./common.utils";
+import { parseZhAroundAliasMark, parseZhDateValue, parseZhDay, parseZhNumberValue, parseZhStepAliasMark, parseZhWeekValue, parseZhWeekValueToDate, parseZhYearValue } from "./zh.utils";
 
 export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   //// zhPeriod
   visitZhPeriodWeek_1(ctx: ZhPeriodWeek_1Context): AnalyzerValue {
-    parseZhNumberValueContext(ctx.zhNumberValue());
 
-    return null;
+    const startWeekDay = parseZhWeekValue(ctx.zhWeekValue()[0]);
+    const endWeekDay = parseZhWeekValue(ctx.zhWeekValue()[1]);
+
+    if (startWeekDay === -1 || endWeekDay === -1) {
+      return null;
+    }
+
+    const offsetWeeks = parseZhNumberValue(ctx.zhNumberValue())* parseZhStepAliasMark(ctx.zhStepAliasMark());
+    ;
+
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.Date,
+      parseZhWeekValueToDate(startWeekDay as WeekValues, offsetWeeks),
+      parseZhWeekValueToDate(endWeekDay as WeekValues, offsetWeeks),
+      ctx,
+    );
   };
 
 	visitZhPeriodWeek_2(ctx: ZhPeriodWeek_2Context): AnalyzerValue {
-    return null;
+
+    const startWeekDay = parseZhWeekValue(ctx.zhWeekValue()[0]);
+    const endWeekDay = parseZhWeekValue(ctx.zhWeekValue()[1]);
+
+    if (startWeekDay === -1 || endWeekDay === -1) {
+      return null;
+    }
+
+    const startOffsetWeeks = parseZhAroundAliasMark(ctx.zhAroundAliasMark()[0]);
+    const endOffsetWeeks = ctx.zhAroundAliasMark().length >= 2
+      ? parseZhAroundAliasMark(ctx.zhAroundAliasMark()[1])
+      : startOffsetWeeks;
+
+      return new AnalyzerPeriodValue(
+        AnalyzerPeriodValueType.Date,
+        parseZhWeekValueToDate(startWeekDay as WeekValues, startOffsetWeeks),
+        parseZhWeekValueToDate(endWeekDay as WeekValues, endOffsetWeeks),
+        ctx,
+      );
+  };
+  visitZhPeriodDateToDate(ctx: ZhPeriodDateToDateContext): AnalyzerValue {
+    const start = this.visit(ctx.zhDate()[0]);
+    const end = this.visit(ctx.zhDate()[1]);
+    if (!start || !end) {
+      return null;
+    }
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.Date,
+      start,
+      end,
+      ctx,
+    );
   };
 
-  visitZhPeriod(ctx: ZhPeriodContext): AnalyzerValue {
-    return null;
+	visitZhPeriodDateTimeToDateTime(ctx: ZhPeriodDateTimeToDateTimeContext): AnalyzerValue {
+    const start = this.visit(ctx.zhDateTime()[0]);
+    const end = this.visit(ctx.zhDateTime()[1]);
+    if (!start || !end) {
+      return null;
+    }
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.DateTime,
+      start,
+      end,
+      ctx,
+    );
   };
 
-	visitZhPeriodWeek(ctx: ZhPeriodWeekContext): AnalyzerValue {
-    return null;
+	visitZhPeriodDateTimeToTime(ctx: ZhPeriodDateTimeToTimeContext): AnalyzerValue {
+    const start = this.visit(ctx.zhDateTime()) as AnalyzerDateTimeValue;
+    const end = this.visit(ctx.zhTime()) as AnalyzerTimeValue;
+    if (!start || !end) {
+      return null;
+    }
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.DateTime,
+      start,
+      new AnalyzerDateTimeValue(
+        start.year, start.month, start.day,
+        end.hour, end.minute, end.second,
+      ),
+      ctx,
+    );
   };
+
+	visitZhPeriodTimeToTime(ctx: ZhPeriodTimeToTimeContext): AnalyzerValue {
+    const start = this.visit(ctx.zhTime()[0]);
+    const end = this.visit(ctx.zhTime()[1]);
+    if (!start || !end) {
+      return null;
+    }
+    return new AnalyzerPeriodValue(
+      AnalyzerPeriodValueType.Time,
+      start,
+      end,
+      ctx,
+    );
+  };
+
 
   //// zhDate
   visitZhDateNormal(ctx: ZhDateNormalContext): AnalyzerValue {
-    return null;
-  };
-
-  visitZhDateAround(ctx: ZhDateAroundContext): AnalyzerValue {
-    return null;
+    if (ctx.zhMonthDay()) {
+      const result = this.visit(ctx.zhMonthDay()) as AnalyzerDateValue;
+      if (ctx.zhYear()) {
+        const year = this.visit(ctx.zhYear()) as AnalyzerDateValue;
+        result.year = year.year;
+      }
+      return result;
+    }
+    if (ctx.zhWeekDay()) {
+      return this.visit(ctx.zhWeekDay());
+    }
+    throw new AnalyzerUnexpectedError();
   };
 
   visitZhDateDayAroundAlias(ctx: ZhDateDayAroundAliasContext): AnalyzerValue {
-    return null;
+    const date = new Date();
+    date.setDate(date.getDate() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()));
+    ;
+    return AnalyzerDateValue.fromDateTime(date, ctx);
   };
 
 	visitZhDateDayAroundStep(ctx: ZhDateDayAroundStepContext): AnalyzerValue {
-    return null;
+    const date = new Date();
+    date.setDate(
+      date.getDate()
+      + parseZhNumberValue(ctx.zhNumberValue()) * parseZhStepAliasMark(ctx.zhStepAliasMark()));
+    ;
+    return AnalyzerDateValue.fromDateTime(date, ctx);
   };
 
 	visitZhWeekDay(ctx: ZhWeekDayContext): AnalyzerValue {
-    return null;
+    const targetWeekDay = parseZhWeekValue(ctx.zhWeekValue());
+    if (targetWeekDay === -1) {
+      return null;
+    }
+    return parseZhWeekValueToDate(
+      targetWeekDay, 
+      ctx.zhNumberValue()
+        ? parseZhNumberValue(ctx.zhNumberValue()) * parseZhStepAliasMark(ctx.zhStepAliasMark())
+        : (ctx.zhAroundAliasMark()
+          ? parseZhAroundAliasMark(ctx.zhAroundAliasMark())
+          : 0)
+      );
   };
 
 	visitZhMonthDay(ctx: ZhMonthDayContext): AnalyzerValue {
@@ -62,7 +171,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
 	visitZhYear(ctx: ZhYearContext): AnalyzerValue {
     if (ctx.zhAroundAliasMark()) {
       return new AnalyzerDateValue(
-        getCurrentYear() + parseZhYearValue(ctx.zhYearValue()),
+        getCurrentYear() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()),
         -1,
         0,
       );
@@ -71,7 +180,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       const offsetType = parseZhStepAliasMark(ctx.zhStepAliasMark());
       
       return new AnalyzerDateValue(
-        getCurrentYear() + parseZhNumberValueContext(ctx.zhNumberValue()) * offsetType,
+        getCurrentYear() + parseZhNumberValue(ctx.zhNumberValue()) * offsetType,
         -1,
         0,
       );
@@ -83,7 +192,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
         0,
       );
     }
-    throw new Error('Unexpected error');
+    throw new AnalyzerUnexpectedError();
   };
 
 	visitZhMonth(ctx: ZhMonthContext): AnalyzerValue {
@@ -105,61 +214,64 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     }
     if (ctx.zhNumberValue()) {
       const date = new Date();
-      date.setMonth(date.getMonth() + parseZhNumberValueContext(ctx.zhNumberValue()) * parseZhStepAliasMark(ctx.zhStepAliasMark()));
+      date.setMonth(date.getMonth() + parseZhNumberValue(ctx.zhNumberValue()) * parseZhStepAliasMark(ctx.zhStepAliasMark()));
       return AnalyzerDateValue.fromDateTime(date);
     }
-    throw new Error('Unexpected error');
+    throw new AnalyzerUnexpectedError();
+  };
+
+  // zhDateTime
+	visitZhDateTime(ctx: ZhDateTimeContext): AnalyzerValue {
+    const date = this.visit(ctx.zhDate()) as AnalyzerDateValue;
+    const time = this.visit(ctx.zhTime()) as AnalyzerTimeValue;
+    if (!date || !time) {
+      return null;
+    }
+    if (ctx.zhTimePeriodAliasMark()
+      && ctx.zhTimePeriodAliasMark().ZhAfternoonWord()
+      && time.hour < 12) {
+      time.hour += 12
+    }
+    return new AnalyzerDateTimeValue(
+      date.year, date.month, date.day,
+      time.hour, time.minute, time.second,
+      ctx,
+    );
+  };
+
+  //// zhTime
+	visitZhTimeNormal(ctx: ZhTimeNormalContext): AnalyzerValue {
+    const values = ctx.zhNumberValue().map((item) => parseZhNumberValue(item));
+    let hour = values[0];
+    const minute = values[1] || 0;
+    const second = values[2] || 0;
+    if (ctx.zhTimePeriodAliasMark()
+      && ctx.zhTimePeriodAliasMark().ZhAfternoonWord()
+      && hour < 12) {
+      hour += 12;
+    }
+    return new AnalyzerTimeValue(hour, minute, second);
   };
 
   //// zhDirectTimeAround
   visitZhTimeHourStep(ctx: ZhTimeHourStepContext): AnalyzerValue {
-    return null;
+    const values = ctx.zhNumberValue().map((item) => parseZhNumberValue(item));
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseZhStepAliasMark(ctx.zhStepAliasMark()),
+        { hour: values[0], minute: values[1] || 0 },
+      ),
+      ctx,
+    );
   };
 
 	visitZhTimeMinuteStep(ctx: ZhTimeMinuteStepContext): AnalyzerValue {
-    return null;
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseZhStepAliasMark(ctx.zhStepAliasMark()),
+        { minute: parseZhNumberValue(ctx.zhNumberValue()) },
+      ),
+      ctx,
+    );
   };
-
-	visitZhDateTime(ctx: ZhDateTimeContext): AnalyzerValue {
-    return null;
-  };
-
-  // zhTime
-	visitZhTime(ctx: ZhTimeContext): AnalyzerValue {
-    return null;
-  };
-
-	visitZhTimeNormal(ctx: ZhTimeNormalContext): AnalyzerValue {
-    return null;
-  };
-
-  //// basic
-  visitZhDateValue(ctx: ZhDateValueContext): AnalyzerValue {
-    return null;
-  };
-  
-	visitZhStepValue(ctx: ZhNumberValueContext): AnalyzerValue {
-    return null;
-  };
-  
-  //// mark
-	visitZhTimePeriodAliasMark(ctx: ZhTimePeriodAliasMarkContext): AnalyzerValue {
-    return null;
-  };
-	visitZhStepAliasMark(ctx: ZhStepAliasMarkContext): AnalyzerValue {
-    return null;
-  };
-  
-	visitZhHourMark(ctx: ZhHourMarkContext): AnalyzerValue {
-    return null;
-  };
-
-	visitZhMinuteMark(ctx: ZhMinuteMarkContext): AnalyzerValue {
-    return null;
-  };
-
-	visitZhSecondMark(ctx: ZhSecondMarkContext): AnalyzerValue {
-    return null;
-  };
-
 }
