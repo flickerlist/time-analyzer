@@ -1,6 +1,6 @@
-import { parseZhWeekValueToDate } from '@/lib/visitor/zh.utils';
-import { TimeAnalyzer, AnalyzerPeriodValueType, AnalyzerValueType } from "@/lib/index";
-import { getCurrentYear } from "@/lib/visitor/common.utils";
+import { parseZhWeekValueToDate } from 'time-analyzer/visitor/zh.utils';
+import { TimeAnalyzer, AnalyzerPeriodValueType, AnalyzerValueType } from "time-analyzer";
+import { getCurrentYear } from "time-analyzer/visitor/common.utils";
 
 describe('Zh Period DateTime', () => {
 

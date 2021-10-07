@@ -1,4 +1,4 @@
-import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
+import { TimeAnalyzer, WeekStartDay } from 'time-analyzer';
 import { expectDateTime } from '../utils';
 
 describe('Zh DateTime', () => {

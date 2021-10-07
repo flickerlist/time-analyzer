@@ -1,6 +1,6 @@
-import { convertWeekDay, getCurrentYear } from '@/lib/visitor/common.utils';
-import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer, WeekStartDay, WeekValues } from '@/lib/index';
-import { parseZhWeekValueToDate } from '@/lib/visitor/zh.utils';
+import { convertWeekDay } from 'time-analyzer/visitor/common.utils';
+import { TimeAnalyzer, WeekStartDay, WeekValues } from 'time-analyzer';
+import { parseZhWeekValueToDate } from 'time-analyzer/visitor/zh.utils';
 import { DatePeriod, expectWeekPeriod } from '../utils';
 
 function getWeekPeriod(

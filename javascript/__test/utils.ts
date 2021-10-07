@@ -1,6 +1,6 @@
-import { TimeAnalyzer } from "@/lib/index";
-import { AnalyzerDateValue, AnalyzerPeriodValueType, AnalyzerValue, AnalyzerValueType, WeekStartDay, WeekValues } from "@/lib/model";
-import { convertWeekDay } from "@/lib/visitor/common.utils";
+import { TimeAnalyzer } from "time-analyzer";
+import { AnalyzerDateValue, AnalyzerPeriodValueType, AnalyzerValue, AnalyzerValueType, WeekStartDay, WeekValues } from "time-analyzer/model";
+import { convertWeekDay } from "time-analyzer/visitor/common.utils";
 
 // expect date
 export function expectDate({

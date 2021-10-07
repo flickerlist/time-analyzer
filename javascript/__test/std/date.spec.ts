@@ -1,4 +1,4 @@
-import { TimeAnalyzer } from '@/lib/index';
+import { TimeAnalyzer } from 'time-analyzer';
 import { expectDate } from '../utils';
 
 describe('Standard Date', () => {

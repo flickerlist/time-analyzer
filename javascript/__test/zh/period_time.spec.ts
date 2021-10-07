@@ -1,4 +1,4 @@
-import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from '@/lib/index';
+import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from 'time-analyzer';
 
 describe('Zh Period Time', () => {
 

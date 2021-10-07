@@ -1,8 +1,9 @@
+lib
 dist
 node_modules
 .temp
 
-lib/grammar/*
-!lib/grammar/*.g4
+src/grammar/*
+!src/grammar/*.g4
 
 yarn-error.log

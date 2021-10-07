@@ -1,5 +1,5 @@
-import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
+import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
+import { TimeAnalyzer, WeekStartDay } from 'time-analyzer';
 import { expectDate } from '../utils';
 
 describe('Zh Date', () => {

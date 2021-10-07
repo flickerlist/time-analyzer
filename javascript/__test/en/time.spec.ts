@@ -1,4 +1,4 @@
-import { TimeAnalyzer, AnalyzerValueType } from '@/lib/index';
+import { TimeAnalyzer } from 'time-analyzer';
 import { expectDateTime, expectTime } from '../utils';
 
 describe('En Time', () => {
@@ -61,6 +61,17 @@ describe('En Time', () => {
       text: '300 hours before',
       addHours: -300,
     });
+  });
+
+  test('Oral Time', () => {
+    const values = new TimeAnalyzer('24:30 at noon').values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None Time', () => {
+    const text = '24:30 at noon';
+    const values = new TimeAnalyzer(`Remind me to meet John ${text}, ok?`).values;
+    expect(values).toHaveLength(0);
   });
   
 });

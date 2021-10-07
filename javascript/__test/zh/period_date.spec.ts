@@ -1,5 +1,5 @@
-import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from '@/lib/index';
+import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
+import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from 'time-analyzer';
 
 describe('Zh Period Date', () => {
 

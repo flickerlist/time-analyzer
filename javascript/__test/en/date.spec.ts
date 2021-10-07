@@ -1,5 +1,5 @@
-import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
+import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
+import { TimeAnalyzer, WeekStartDay } from 'time-analyzer';
 import { expectDate } from '../utils';
 
 describe('En Date', () => {
@@ -197,7 +197,7 @@ describe('En Date', () => {
     });
   });
   
-  test('Date days: step later', () => {
+  test('Oral Date days: step later', () => {
     const text = '40 days later';
     expectDate({
       text,
@@ -208,6 +208,11 @@ describe('En Date', () => {
 
   test('None Date', () => {
     const values = new TimeAnalyzer('July 32, 2022').values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None Date', () => {
+    const values = new TimeAnalyzer('Julya 32, 2022').values;
     expect(values).toHaveLength(0);
   });
   

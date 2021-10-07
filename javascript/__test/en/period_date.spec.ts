@@ -1,5 +1,5 @@
-import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
+import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
+import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
 
 describe('En Period Date', () => {
 

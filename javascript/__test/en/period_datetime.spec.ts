@@ -1,6 +1,6 @@
-import { parseEnWeekValueToDate } from '@/lib/visitor/en.utils';
-import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/index';
+import { parseEnWeekValueToDate } from 'time-analyzer/visitor/en.utils';
+import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
+import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
 
 describe('En Period Time', () => {
 
@@ -145,7 +145,7 @@ describe('En Period Time', () => {
     });
   });
 
-  test('Oral', () => {
+  test('Oral DateTime', () => {
     const text = 'at 1 a.m. to 3 p.m., next Friday';
     const values = new TimeAnalyzer(`Remind me to meet John ${text}, ok?`).values;
     const date = parseEnWeekValueToDate(5, 1);
@@ -178,5 +178,10 @@ describe('En Period Time', () => {
         text: text,
       },
     });
+  });
+
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('March 5th, 25 p.m. to 3 p.m.').values;
+    expect(values).toHaveLength(0);
   });
 });

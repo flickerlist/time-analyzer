@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "target": "es2020",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
     "baseUrl": "./",
     "incremental": true,
     "allowJs": true,
@@ -17,9 +17,10 @@
       }
     ],
     "paths": {
-      "@/lib/*": ["lib/*"]
+      "time-analyzer": ["src/index.ts"],
+      "time-analyzer/*": ["src/*"],
     }
   },
-  "include": ["lib", "__test"],
+  "include": ["src", "__test"],
   "exclude": ["node_modules", "dist"]
 }

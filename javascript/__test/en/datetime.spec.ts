@@ -1,5 +1,5 @@
-import { TimeAnalyzer, AnalyzerValueType, WeekValues } from '@/lib/index';
-import { convertWeekDay, getCurrentYear } from '@/lib/visitor/common.utils';
+import { TimeAnalyzer } from 'time-analyzer';
+import { convertWeekDay, getCurrentYear } from 'time-analyzer/visitor/common.utils';
 import { expectDateTime } from '../utils';
 
 describe('En DateTime', () => {
@@ -43,6 +43,18 @@ describe('En DateTime', () => {
   test('DateTime', () => {
     expectDateTime({
       text: 'at 5:50 on Saturday afternoon',
+      weekDay: convertWeekDay(6),
+      hour: 17,
+      minute: 50,
+      second: 0,
+    });
+  });
+
+  test('Oral DateTime', () => {
+    const text = 'at 5:50 on Saturday afternoon';
+    expectDateTime({
+      fullText: `Remind me to meet John ${text}, ok?`,
+      text,
       weekDay: convertWeekDay(6),
       hour: 17,
       minute: 50,
