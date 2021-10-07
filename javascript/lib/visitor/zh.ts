@@ -1,12 +1,12 @@
 import { ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhTimeNormalContext, ZhWeekDayContext, ZhYearContext, ZhPeriodDateToDateContext, ZhPeriodDateTimeToDateTimeContext, ZhPeriodDateTimeToTimeContext, ZhPeriodTimeToTimeContext, ZhPeriodMonthDayToMonthDayContext } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, AnalyzerUnexpectedError, AnalyzerValue, WeekValues } from "../model";
 import { StdTimeAnalyzerVisitor } from "./std";
-import { computedAroundTime, getCurrentYear } from "./common.utils";
+import { computedAroundTime, getCurrentYear, parsePeriodDateTimeToTime } from "./common.utils";
 import { parseZhAroundAliasMark, parseZhDateValue, parseZhDay, parseZhNumberValue, parseZhStepAliasMark, parseZhWeekValue, parseZhWeekValueToDate, parseZhYearValue, zhTimeHasPerioldAliasMark, zhTimeIsAfternoon } from "./zh.utils";
 
 export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   //// zhPeriod
-  visitZhPeriodWeek_1(ctx: ZhPeriodWeek_1Context): AnalyzerValue {
+  visitZhPeriodWeek_1(ctx: ZhPeriodWeek_1Context): AnalyzerValue | null {
 
     const startWeekDay = parseZhWeekValue(ctx.zhWeekValue()[0]);
     const endWeekDay = parseZhWeekValue(ctx.zhWeekValue()[1]);
@@ -16,7 +16,6 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     }
 
     const offsetWeeks = parseZhNumberValue(ctx.zhNumberValue())* parseZhStepAliasMark(ctx.zhStepAliasMark());
-    ;
 
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
@@ -26,7 +25,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     );
   };
 
-	visitZhPeriodWeek_2(ctx: ZhPeriodWeek_2Context): AnalyzerValue {
+	visitZhPeriodWeek_2(ctx: ZhPeriodWeek_2Context): AnalyzerValue | null {
 
     const startWeekDay = parseZhWeekValue(ctx.zhWeekValue()[0]);
     const endWeekDay = parseZhWeekValue(ctx.zhWeekValue()[1]);
@@ -47,9 +46,15 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       ctx,
     );
   };
-	visitZhPeriodMonthDayToMonthDay(ctx: ZhPeriodMonthDayToMonthDayContext): AnalyzerValue {
+	visitZhPeriodMonthDayToMonthDay(ctx: ZhPeriodMonthDayToMonthDayContext): AnalyzerValue | null {
     const months = ctx.zhMonth().map((item) => this.visit(item) as AnalyzerDateValue);
     const days = ctx.zhDay().map((item) => parseZhDay(item));
+    if (!months[0]
+      || (months.length > 1 && !months[1])
+      || !days[0] || days[0] < 1 || days[0] > 31
+      || !days[1] || days[1] < 1 || days[1] > 31) {
+      return null;
+    }
     
     if (ctx.zhYear()) {
       const year = this.visit(ctx.zhYear()) as AnalyzerDateValue;
@@ -98,7 +103,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     );
   };
 
-	visitZhPeriodDateTimeToTime(ctx: ZhPeriodDateTimeToTimeContext): AnalyzerValue {
+	visitZhPeriodDateTimeToTime(ctx: ZhPeriodDateTimeToTimeContext): AnalyzerValue | null {
     const start = this.visit(ctx.zhDateTime()) as AnalyzerDateTimeValue;
     const end = this.visit(ctx.zhTime()) as AnalyzerTimeValue;
     if (!start || !end) {
@@ -109,18 +114,14 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       && end.hour < 12) {
       end.hour += 12;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.DateTime,
+    return parsePeriodDateTimeToTime(
       start,
-      new AnalyzerDateTimeValue(
-        start.year, start.month, start.day,
-        end.hour, end.minute, end.second,
-      ),
+      end,
       ctx,
     );
   };
 
-	visitZhPeriodTimeToTime(ctx: ZhPeriodTimeToTimeContext): AnalyzerValue {
+	visitZhPeriodTimeToTime(ctx: ZhPeriodTimeToTimeContext): AnalyzerValue | null {
     const start = this.visit(ctx.zhTime()[0]) as AnalyzerTimeValue;
     const end = this.visit(ctx.zhTime()[1]) as AnalyzerTimeValue;
     if (!start || !end) {
@@ -141,9 +142,12 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
 
 
   //// zhDate
-  visitZhDateNormal(ctx: ZhDateNormalContext): AnalyzerValue {
+  visitZhDateNormal(ctx: ZhDateNormalContext): AnalyzerDateValue | null {
     if (ctx.zhMonthDay()) {
       const result = this.visit(ctx.zhMonthDay()) as AnalyzerDateValue;
+      if (!result) {
+        return null;
+      }
       if (ctx.zhYear()) {
         const year = this.visit(ctx.zhYear()) as AnalyzerDateValue;
         result.year = year.year;
@@ -151,12 +155,12 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       return result;
     }
     if (ctx.zhWeekDay()) {
-      return this.visit(ctx.zhWeekDay());
+      return this.visit(ctx.zhWeekDay()) as AnalyzerDateValue;
     }
     throw new AnalyzerUnexpectedError();
   };
 
-  visitZhDateDayAroundAlias(ctx: ZhDateDayAroundAliasContext): AnalyzerValue {
+  visitZhDateDayAroundAlias(ctx: ZhDateDayAroundAliasContext): AnalyzerDateValue {
     const date = new Date();
     date.setDate(date.getDate() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()));
     ;
@@ -172,7 +176,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     return AnalyzerDateValue.fromDateTime(date, ctx);
   };
 
-	visitZhWeekDay(ctx: ZhWeekDayContext): AnalyzerValue {
+	visitZhWeekDay(ctx: ZhWeekDayContext): AnalyzerDateValue | null {
     const targetWeekDay = parseZhWeekValue(ctx.zhWeekValue());
     if (targetWeekDay === -1) {
       return null;
@@ -187,10 +191,10 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       );
   };
 
-	visitZhMonthDay(ctx: ZhMonthDayContext): AnalyzerValue {
+	visitZhMonthDay(ctx: ZhMonthDayContext): AnalyzerDateValue | null {
     const month = this.visit(ctx.zhMonth()) as AnalyzerDateValue;
     const day = parseZhDay(ctx.zhDay());
-    if (day <= 0) {
+    if (!month || !day || day <= 0 || day > 31) {
       return null;
     }
     return new AnalyzerDateValue(
@@ -201,7 +205,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     );
   };
 
-	visitZhYear(ctx: ZhYearContext): AnalyzerValue {
+	visitZhYear(ctx: ZhYearContext): AnalyzerDateValue {
     if (ctx.zhAroundAliasMark()) {
       return new AnalyzerDateValue(
         getCurrentYear() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()),
@@ -219,8 +223,9 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       );
     }
     if (ctx.zhYearValue()) {
+      const year = parseZhYearValue(ctx.zhYearValue());
       return new AnalyzerDateValue(
-        parseZhYearValue(ctx.zhYearValue()),
+        year,
         -1,
         0,
       );
@@ -228,10 +233,10 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     throw new AnalyzerUnexpectedError();
   };
 
-	visitZhMonth(ctx: ZhMonthContext): AnalyzerValue {
+	visitZhMonth(ctx: ZhMonthContext): AnalyzerDateValue | null {
     if (ctx.zhDateValue()) {
       const month = parseZhDateValue(ctx.zhDateValue());
-      if (month <= 0) {
+      if (month < 1 || month > 12) {
         return null;
       }
       return new AnalyzerDateValue(
@@ -254,7 +259,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   };
 
   // zhDateTime
-	visitZhDateTime(ctx: ZhDateTimeContext): AnalyzerValue {
+	visitZhDateTime(ctx: ZhDateTimeContext): AnalyzerDateTimeValue | null {
     const date = this.visit(ctx.zhDate()) as AnalyzerDateValue;
     const time = this.visit(ctx.zhTime()) as AnalyzerTimeValue;
     if (!date || !time) {
@@ -273,11 +278,16 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   };
 
   //// zhTime
-	visitZhTimeNormal(ctx: ZhTimeNormalContext): AnalyzerValue {
+	visitZhTimeNormal(ctx: ZhTimeNormalContext): AnalyzerTimeValue | null {
     const values = ctx.zhNumberValue().map((item) => parseZhNumberValue(item));
     let hour = values[0];
     const minute = values[1] || 0;
     const second = values[2] || 0;
+    if (hour >= 24 || hour < 0
+      || minute >= 60 || minute < 0
+      || second >= 60 || second < 0) {
+      return null;
+    }
     if (ctx.zhTimePeriodAliasMark()
       && ctx.zhTimePeriodAliasMark().ZhAfternoonWord()
       && hour < 12) {

@@ -150,7 +150,7 @@ export function parseEnWeekValueToDate(
   targetWeekValue: WeekValues,
   offsetWeeks: number,
   ctx?: ParserRuleContext,
-): AnalyzerDateValue | null {
+): AnalyzerDateValue {
   const now = new Date();
   now.setDate(
     now.getDate()

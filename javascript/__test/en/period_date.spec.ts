@@ -3,7 +3,7 @@ import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from '@/lib/
 
 describe('En Period Date', () => {
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('March 3-5, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
@@ -29,7 +29,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('March 3rd-5th, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
@@ -55,7 +55,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('March 3rd to 5th, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
@@ -81,7 +81,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('March 3 to 5').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
@@ -107,7 +107,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('3rd to 5th of next month').values;
     expect(values).toHaveLength(1);
 
@@ -137,7 +137,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const values = new TimeAnalyzer('next month, on the 3-5').values;
     expect(values).toHaveLength(1);
 
@@ -167,7 +167,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const text = 'March 5 to April 5, 2022';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -195,7 +195,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const text = 'March 5 to April 5, next year';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -223,7 +223,7 @@ describe('En Period Date', () => {
     });
   });
 
-  test('Period', () => {
+  test('Period Date', () => {
     const text = 'March 5 to April 5, 3 years later';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -249,6 +249,40 @@ describe('En Period Date', () => {
         text,
       },
     });
+  });
+
+  test('Oral Period Date', () => {
+    const text = 'at March 5 to April 5, 3 years later';
+    const fullText = `Remind me to meet ${text}, at CN, ok?`;
+    const values = new TimeAnalyzer(fullText).values;
+    expect(values).toHaveLength(1);
+
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 3,
+        month: 2,
+        day: 5,
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 3,
+        month: 3,
+        day: 5,
+      },
+      match: {
+        startIndex: fullText.indexOf(text),
+        endIndex: fullText.indexOf(text) + text.length,
+        text,
+      },
+    });
+  });
+
+  test('None Period Date', () => {
+    const values = new TimeAnalyzer('March 5 to April 35, 3 years later').values;
+    expect(values).toHaveLength(0);
   });
 
 });

@@ -175,4 +175,14 @@ describe('Standard Period', () => {
       },
     });
   });
+  
+  test('None Period Time', () => {
+    const values = new TimeAnalyzer('25:30-16:30').values;
+    expect(values).toHaveLength(0);
+  });
+  
+  test('None Period DateTime', () => {
+    const values = new TimeAnalyzer('13-01 15:30-16:30').values;
+    expect(values).toHaveLength(0);
+  });
 });

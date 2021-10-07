@@ -55,5 +55,21 @@ describe('Zh Period Week', () => {
 
     expectWeekPeriod(values[0], dates, text);
   });
+
+  test('Oral Period Week', () => {
+    const text = '3周後的週一到周日';
+    const fullText = `很重要，${text}要完寫晋昇PPT`;
+    const values = new TimeAnalyzer(fullText).values;
+    expect(values).toHaveLength(1);
+
+    const dates = getWeekPeriod(1, 0, 3);
+
+    expectWeekPeriod(values[0], dates, text, 4);
+  });
+
+  test('None Period Week', () => {
+    const values = new TimeAnalyzer('3周後的週零到周日').values;
+    expect(values).toHaveLength(0);
+  });
   
 });

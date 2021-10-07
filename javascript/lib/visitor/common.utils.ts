@@ -1,14 +1,17 @@
 import { ParserRuleContext } from "antlr4ts";
-import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues, StepOffsetType, AnalyzerUnexpectedError, WeekStartDay } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues, StepOffsetType, AnalyzerUnexpectedError, WeekStartDay, AnalyzerValue } from "../model";
 import { NumberValueContext, YearValueContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
 
 // parse period type: dateTime to time
-export function parsePeriodToTime(
+export function parsePeriodDateTimeToTime(
   startDateTime: AnalyzerDateTimeValue,
   endTime: AnalyzerTimeValue,
   ctx: ParserRuleContext,
-  ) {
+  ): AnalyzerValue | null {
+  if (!startDateTime || !endTime) {
+    return null;
+  }
   const endDateTime = new AnalyzerDateTimeValue(
     startDateTime.year,
     startDateTime.month,

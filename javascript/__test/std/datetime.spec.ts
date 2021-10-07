@@ -1,3 +1,4 @@
+import { TimeAnalyzer } from '@/lib/index';
 import { expectDateTime } from '../utils';
 
 describe('Standard DateTime', () => {
@@ -26,7 +27,7 @@ describe('Standard DateTime', () => {
     });
   });
   
-  test('Oral', () => {
+  test('Oral DateTime', () => {
     const text = 'at 2022-07-01 15:30';
     expectDateTime({
       text,
@@ -38,5 +39,10 @@ describe('Standard DateTime', () => {
       minute: 30,
       second: 0,
     });
+  });
+  
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('at 2022-13-01 15:30').values;
+    expect(values).toHaveLength(0);
   });
 });

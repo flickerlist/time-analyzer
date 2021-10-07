@@ -195,7 +195,10 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
     dateValue: AnalyzerDateValue,
     timeValue: AnalyzerTimeValue,
     context?: ParserRuleContext,
-  ) {
+  ): AnalyzerDateTimeValue | null {
+    if (!dateValue || !timeValue) {
+      return null;
+    }
     return new AnalyzerDateTimeValue(
       dateValue.year,
       dateValue.month,

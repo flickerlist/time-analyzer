@@ -1,5 +1,5 @@
 import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { WeekStartDay } from '@/lib/index';
+import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
 import { expectDate } from '../utils';
 
 describe('Zh Date', () => {
@@ -154,6 +154,21 @@ describe('Zh Date', () => {
       text: '3天后',
       addDays: 3,
     });
+  });
+
+  test('Oral Date Around', () => {
+    const text = '3天后';
+    const fullText = `陈奕迅${text}有一场演唱会`;
+    expectDate({
+      text,
+      fullText,
+      addDays: 3,
+    });
+  });
+
+  test('None Date', () => {
+    const values = new TimeAnalyzer('下下个月32号').values;
+    expect(values).toHaveLength(0);
   });
   
 });

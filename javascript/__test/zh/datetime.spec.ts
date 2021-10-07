@@ -1,4 +1,4 @@
-import { WeekStartDay } from '@/lib/model';
+import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
 import { expectDateTime } from '../utils';
 
 describe('Zh DateTime', () => {
@@ -61,6 +61,42 @@ describe('Zh DateTime', () => {
       second: 0,
       weekStart: WeekStartDay.Monday,
     });
+  });
+  
+  test('DateTime', () => {
+    expectDateTime({
+      text: '下周六下午13点', // '下午' will ignore
+      weekDay: 6,
+      addWeeks: 1,
+      hour: 13,
+      minute: 0,
+      second: 0,
+      weekStart: WeekStartDay.Monday,
+    });
+  });
+
+  test('Oral DateTime', () => {
+    const text = '下周六下午3点';
+    expectDateTime({
+      text,
+      fullText: `记得${text}提醒我开会`,
+      weekDay: 6,
+      addWeeks: 1,
+      hour: 15,
+      minute: 0,
+      second: 0,
+      weekStart: WeekStartDay.Monday,
+    });
+  });
+
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('下周八下午3点').values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('下周六下午25点').values;
+    expect(values).toHaveLength(0);
   });
   
 });

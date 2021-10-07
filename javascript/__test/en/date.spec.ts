@@ -1,6 +1,5 @@
-import { parseEnWeekValueToDate } from '@/lib/visitor/en.utils';
 import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, WeekStartDay } from '@/lib/index';
+import { TimeAnalyzer, WeekStartDay } from '@/lib/index';
 import { expectDate } from '../utils';
 
 describe('En Date', () => {
@@ -205,6 +204,11 @@ describe('En Date', () => {
       fullText: `Send message to Linda ${text}.`,
       addDays: 40,
     });
+  });
+
+  test('None Date', () => {
+    const values = new TimeAnalyzer('July 32, 2022').values;
+    expect(values).toHaveLength(0);
   });
   
 });

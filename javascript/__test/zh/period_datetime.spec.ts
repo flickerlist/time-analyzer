@@ -2,9 +2,9 @@ import { parseZhWeekValueToDate } from '@/lib/visitor/zh.utils';
 import { TimeAnalyzer, AnalyzerPeriodValueType, AnalyzerValueType } from "@/lib/index";
 import { getCurrentYear } from "@/lib/visitor/common.utils";
 
-describe('En Period Time', () => {
+describe('Zh Period DateTime', () => {
 
-  test('Period Time', () => {
+  test('Period DateTime', () => {
     const text = '3月5日，下午1点到下午3点';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -37,7 +37,7 @@ describe('En Period Time', () => {
     });
   });
 
-  test('Period Time', () => {
+  test('Period DateTime', () => {
     const text = '3月5日下午1点到3月6日上午3点';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -70,7 +70,7 @@ describe('En Period Time', () => {
     });
   });
 
-  test('Period Time', () => {
+  test('Period DateTime', () => {
     const text = '明天下午1点45到后天上午3点';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -109,7 +109,7 @@ describe('En Period Time', () => {
     });
   });
 
-  test('Period Time', () => {
+  test('Period DateTime', () => {
     const text = '下周五下午3点到5点';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -145,7 +145,7 @@ describe('En Period Time', () => {
     });
   });
 
-  test('Period Time', () => {
+  test('Period DateTime', () => {
     const text = '下周五下午3点15到下下周日5点15分';
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
@@ -180,5 +180,53 @@ describe('En Period Time', () => {
         text: text,
       },
     });
+  });
+
+  test('Oral Period DateTime', () => {
+    const text = '下周五下午3点15到下下周日5点15分';
+    const fullText = `天狗吃月，${text}记得做准备`;
+    const values = new TimeAnalyzer(fullText).values;
+    expect(values).toHaveLength(1);
+
+    const startDate = parseZhWeekValueToDate(5, 1);
+    const endDate = parseZhWeekValueToDate(7, 2);
+
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.DateTime,
+      start: {
+        valueType: AnalyzerValueType.DateTime,
+        year: startDate.year,
+        month: startDate.month,
+        day: startDate.day,
+        hour: 15,
+        minute: 15,
+        second: 0,
+      },
+      end: {
+        valueType: AnalyzerValueType.DateTime,
+        year: endDate.year,
+        month: endDate.month,
+        day: endDate.day,
+        hour: 5,
+        minute: 15,
+        second: 0,
+      },
+      match: {
+        startIndex: fullText.indexOf(text),
+        endIndex: fullText.indexOf(text) + text.length,
+        text,
+      },
+    });
+  });
+
+  test('None Period DateTime', () => {
+    const values = new TimeAnalyzer('下周五下午3点15到下下周日25点15分').values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None Period DateTime', () => {
+    const values = new TimeAnalyzer('下周八下午3点15到下下周日5点15分').values;
+    expect(values).toHaveLength(0);
   });
 });

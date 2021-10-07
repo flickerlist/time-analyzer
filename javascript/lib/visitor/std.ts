@@ -1,45 +1,57 @@
 import { StdDateTimeContext, StdDateContext, StdTimeContext, StdPeriodDateToDateContext, StdPeriodTimeToTimeContext, StdPeriodDateTimeToTimeContext, StdPeriodDateTimeToDateTimeContext } from "../grammar/TimeParser";
 import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType } from "../model";
 import { BasicTimeAnalyzerVisitor } from "./basic";
-import { parsePeriodToTime } from "./common.utils";
-import { getCurrentYear, parseYearValue } from "./common.utils";
+import { getCurrentYear, parsePeriodDateTimeToTime, parseYearValue } from "./common.utils";
 import { parseToInt, parseToMonthValue } from "../utils/convert";
 
 export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
 
-	visitStdPeriodDateToDate = (ctx: StdPeriodDateToDateContext): AnalyzerValue => {
+	visitStdPeriodDateToDate(ctx: StdPeriodDateToDateContext): AnalyzerValue | null {
+    const start = this.visit(ctx.stdDate()[0]);
+    const end = this.visit(ctx.stdDate()[1]);
+    if (!start || !end) {
+      return null;
+    }
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
-      this.visit(ctx.stdDate()[0]),
-      this.visit(ctx.stdDate()[1]),
+      start,
+      end,
       ctx,
     );
   };
 
-	visitStdPeriodDateTimeToDateTime = (ctx: StdPeriodDateTimeToDateTimeContext): AnalyzerValue => {
+	visitStdPeriodDateTimeToDateTime(ctx: StdPeriodDateTimeToDateTimeContext): AnalyzerValue | null {
+    const start = this.visit(ctx.stdDateTime()[0]);
+    const end = this.visit(ctx.stdDateTime()[1]);
+    if (!start || !end) {
+      return null;
+    }
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.DateTime,
-      this.visit(ctx.stdDateTime()[0]),
-      this.visit(ctx.stdDateTime()[1]),
+      start,
+      end,
       ctx,
     );
   };
 
-	visitStdPeriodDateTimeToTime = (ctx: StdPeriodDateTimeToTimeContext): AnalyzerValue => {
-    return parsePeriodToTime(
+	visitStdPeriodDateTimeToTime(ctx: StdPeriodDateTimeToTimeContext): AnalyzerValue | null {
+    return parsePeriodDateTimeToTime(
       this.visit(ctx.stdDateTime()) as AnalyzerDateTimeValue,
       this.visit(ctx.stdTime()) as AnalyzerTimeValue,
       ctx,
     );
   };
 
-	visitStdPeriodTimeToTime = (ctx: StdPeriodTimeToTimeContext): AnalyzerValue => {
+	visitStdPeriodTimeToTime(ctx: StdPeriodTimeToTimeContext): AnalyzerValue | null {
     let date: AnalyzerDateValue = null;
     if (ctx.stdDate()) {
       date = this.visit(ctx.stdDate()) as AnalyzerDateValue;
     }
     const start = this.visit(ctx.stdTime()[0]) as AnalyzerTimeValue;
     const end = this.visit(ctx.stdTime()[1]) as AnalyzerTimeValue;
+    if (!start || !end) {
+      return null;
+    }
     if (date) {
       return new AnalyzerPeriodValue(
         AnalyzerPeriodValueType.DateTime,
@@ -62,32 +74,39 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
     );
   };
 
-  visitStdDateTime = (ctx: StdDateTimeContext): AnalyzerValue => {
+  visitStdDateTime(ctx: StdDateTimeContext): AnalyzerValue {
     return AnalyzerDateTimeValue.create(
       this.visit(ctx.stdDate()) as AnalyzerDateValue, 
       this.visit(ctx.stdTime()) as AnalyzerTimeValue,
     );
   };
 
-  visitStdDate = (ctx: StdDateContext): AnalyzerValue => {
+  visitStdDate(ctx: StdDateContext): AnalyzerValue | null {
     const year = ctx.yearValue()
       ? parseYearValue(ctx.yearValue())
       : getCurrentYear();
     const month = parseToMonthValue(ctx.DateNumber()[0].text);
     const day = parseToInt(ctx.DateNumber()[1].text);
 
-    if (month < 0) {
+    if (year < 0
+      || month < 0 || month > 11
+      || day < 1 || day > 31) {
       return null;
     }
 
     return new AnalyzerDateValue(year, month, day, ctx);
-
   };
   
-  visitStdTime = (ctx: StdTimeContext): AnalyzerValue => {
+  visitStdTime(ctx: StdTimeContext): AnalyzerTimeValue | null {
     const hour = parseToInt(ctx.DateNumber()[0].text);
     const minute = parseToInt(ctx.DateNumber()[1].text);
     const second = ctx.DateNumber()[2]? parseToInt(ctx.DateNumber()[2].text) : 0;
+
+    if (hour >= 24 || hour < 0
+      || minute >= 60 || minute < 0
+      || second >= 60 || second < 0) {
+      return null;
+    }
     
     return new AnalyzerTimeValue(hour, minute, second, ctx);
   };

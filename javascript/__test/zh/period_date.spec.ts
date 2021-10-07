@@ -1,5 +1,5 @@
 import { getCurrentYear } from '@/lib/visitor/common.utils';
-import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer, WeekStartDay } from '@/lib/index';
+import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from '@/lib/index';
 
 describe('Zh Period Date', () => {
 
@@ -255,6 +255,46 @@ describe('Zh Period Date', () => {
         text: text,
       },
     });
+  });
+
+  test('Oral Period Date', () => {
+    const text = '十六年后，七月一日到七月廿一日';
+    const fullText = `谨记，${text}与姑姑会和`;
+    const values = new TimeAnalyzer(fullText).values;
+    expect(values).toHaveLength(1);
+
+    expect(values[0]).toMatchObject({
+      valueType: AnalyzerValueType.Period,
+      periodType: AnalyzerPeriodValueType.Date,
+      start: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 16,
+        month: 6,
+        day: 1,
+      },
+      end: {
+        valueType: AnalyzerValueType.Date,
+        year: getCurrentYear() + 16,
+        month: 6,
+        day: 21,
+      },
+      match: {
+        startIndex: fullText.indexOf(text),
+        endIndex: fullText.indexOf(text) + text.length,
+        text,
+      },
+    });
+  });
+
+  test('None Period Date', () => {
+    const text = '七月三十五日到七月廿一日';
+    const values = new TimeAnalyzer(text).values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None Period Date', () => {
+    const values = new TimeAnalyzer('七月五日到七月廿二十一日').values;
+    expect(values).toHaveLength(0);
   });
   
 });

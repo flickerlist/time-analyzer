@@ -55,11 +55,17 @@ export function parseZhDateValue(zhDateValue: ZhDateValueContext) {
 }
 
 // parse zhDay context
-export function parseZhDay(ctx: ZhDayContext): number {
+export function parseZhDay(ctx: ZhDayContext): number | null {
+  let result = -1;
   if (ctx.zhDateValue().DateNumber()) {
-    return parseToInt(ctx.zhDateValue().DateNumber().text, 0);
+    result = parseToInt(ctx.zhDateValue().DateNumber().text, 0);
+  } else {
+    result = parseZhValueWord(ctx.zhDateValue().ZhValueWord());
   }
-  return parseZhValueWord(ctx.zhDateValue().ZhValueWord());
+  if (result < 1 || result > 31) {
+    return null;
+  }
+  return result;
 }
 
 // parse zhAroundAliasMark
@@ -120,7 +126,7 @@ export function parseZhWeekValueToDate(
   targetWeekValue: WeekValues,
   offsetWeeks: number,
   ctx?: ParserRuleContext,
-): AnalyzerDateValue | null {
+): AnalyzerDateValue {
   const now = new Date();
   now.setDate(
     now.getDate()

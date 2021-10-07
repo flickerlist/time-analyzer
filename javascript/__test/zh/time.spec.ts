@@ -1,3 +1,4 @@
+import { TimeAnalyzer } from '@/lib/index';
 import { expectDateTime, expectTime } from '../utils';
 
 describe('Zh Time', () => {
@@ -56,6 +57,26 @@ describe('Zh Time', () => {
     });
   });
 
+  test('Abnormal Time', () => {
+    expectTime({
+      fullText: '下午3点-30分',
+      text: '下午3点', // only match normal part
+      hour: 15,
+      minute: 0,
+      second: 0,
+    });
+  });
+
+  test('Abnormal Time', () => {
+    expectTime({
+      fullText: '下午-3点30分',
+      text: '3点30分', // only match normal part
+      hour: 3,
+      minute: 30,
+      second: 0,
+    });
+  });
+  
   test('DirectTimeAround', () => {
     expectDateTime({
       text: '3个小时后',
@@ -83,6 +104,20 @@ describe('Zh Time', () => {
       addHours: 3,
       addMinutes: 20,
     });
+  });
+
+  test('Oral DirectTimeAround', () => {
+    const text = '在20分鐘後';
+    expectDateTime({
+      text,
+      fullText: `記得${text}提醒我開會`,
+      addMinutes: 20,
+    });
+  });
+
+  test('None Time', () => {
+    const values = new TimeAnalyzer('下午24点30分').values;
+    expect(values).toHaveLength(0);
   });
   
 });

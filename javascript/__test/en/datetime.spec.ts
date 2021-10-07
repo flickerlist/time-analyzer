@@ -49,5 +49,15 @@ describe('En DateTime', () => {
       second: 0,
     });
   });
+
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('at 24:50 on Saturday afternoon').values;
+    expect(values).toHaveLength(0);
+  });
+
+  test('None DateTime', () => {
+    const values = new TimeAnalyzer('at 5:60 on Saturday afternoon').values;
+    expect(values).toHaveLength(0);
+  });
   
 });

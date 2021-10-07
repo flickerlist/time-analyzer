@@ -1,43 +1,56 @@
 import { AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerUnexpectedError, AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from '../model';
 import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext } from "../grammar/TimeParser";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
-import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodToTime } from "./common.utils";
+import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodDateTimeToTime } from "./common.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
 import { parseToInt } from '../utils/convert';
 
 export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enPeriod
-	visitEnPeriodDateToDate(ctx: EnPeriodDateToDateContext): AnalyzerValue {
+	visitEnPeriodDateToDate(ctx: EnPeriodDateToDateContext): AnalyzerValue | null {
+    const start = this.visit(ctx.enDate()[0]);
+    const end = this.visit(ctx.enDate()[1]);
+    if (!start || !end) {
+      return null;
+    }
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
-      this.visit(ctx.enDate()[0]),
-      this.visit(ctx.enDate()[1]),
+      start,
+      end,
       ctx,
     );
   };
-	visitEnPeriodDateTimeToDateTime(ctx: EnPeriodDateTimeToDateTimeContext): AnalyzerValue {
+	visitEnPeriodDateTimeToDateTime(ctx: EnPeriodDateTimeToDateTimeContext): AnalyzerValue | null {
+    const start = this.visit(ctx.enDateTime()[0]);
+    const end = this.visit(ctx.enDateTime()[1]);
+    if (!start || !end) {
+      return null;
+    }
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.DateTime,
-      this.visit(ctx.enDateTime()[0]),
-      this.visit(ctx.enDateTime()[1]),
+      start,
+      end,
       ctx,
     );
   };
-	visitEnPeriodDateTimeToTime (ctx: EnPeriodDateTimeToTimeContext): AnalyzerValue {
-    return parsePeriodToTime(
+	visitEnPeriodDateTimeToTime (ctx: EnPeriodDateTimeToTimeContext): AnalyzerValue | null {
+    return parsePeriodDateTimeToTime(
       this.visit(ctx.enDateTime()) as AnalyzerDateTimeValue,
       this.visit(ctx.enTime()) as AnalyzerTimeValue,
       ctx,
     );
   };
-	visitEnPeriodTimeToTime (ctx: EnPeriodTimeToTimeContext): AnalyzerValue {
+	visitEnPeriodTimeToTime (ctx: EnPeriodTimeToTimeContext): AnalyzerValue | null {
     let date: AnalyzerDateValue = null;
     if (ctx.enDate()) {
       date = this.visit(ctx.enDate()) as AnalyzerDateValue;
     }
     const start = this.visit(ctx.enTime()[0]) as AnalyzerTimeValue;
     const end = this.visit(ctx.enTime()[1]) as AnalyzerTimeValue;
+    if (!start || !end) {
+      return null;
+    }
     if (date) {
       return new AnalyzerPeriodValue(
         AnalyzerPeriodValueType.DateTime,
@@ -58,27 +71,34 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       ctx,
     );
   };
-	visitEnPeriodMonthDayToMonthDay (ctx: EnPeriodMonthDayToMonthDayContext): AnalyzerValue {
+	visitEnPeriodMonthDayToMonthDay (ctx: EnPeriodMonthDayToMonthDayContext): AnalyzerValue | null {
     const months = ctx.enMonth().map((item) => this.visit(item) as AnalyzerDateValue);
+    const days = ctx.enDay().map((item) => parseEnDay(item));
+
+    if (!months[0]
+      || (months.length > 1 && !months[1])
+      || !days[0] || days[0] < 1 || days[0] > 31
+      || !days[1] || days[1] < 1 || days[1] > 31) {
+      return null;
+    }
+
     if (ctx.enYear()) {
       const year = this.visit(ctx.enYear()) as AnalyzerDateValue;
       months.map((item) => item.year = year.year);
     }
     const start = months[0];
     const end = months[1] || start;
-    const startDay = parseEnDay(ctx.enDay()[0]);
-    const endDay = parseEnDay(ctx.enDay()[1]);
     return new AnalyzerPeriodValue(
       AnalyzerPeriodValueType.Date,
       new AnalyzerDateValue(
         start.year,
         start.month,
-        startDay,
+        days[0],
       ),
       new AnalyzerDateValue(
         end.year,
         end.month,
-        endDay,
+        days[1],
       ),
       ctx,
     );
@@ -131,13 +151,15 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
 
-
   //// enDateTime
-	visitEnDateTime(ctx: EnDateTimeContext): AnalyzerValue {
+	visitEnDateTime(ctx: EnDateTimeContext): AnalyzerValue | null {
     const value = AnalyzerDateTimeValue.create(
       this.visit(ctx.enDate()) as AnalyzerDateValue, 
       this.visit(ctx.enTime()) as AnalyzerTimeValue,
     );
+    if (!value) {
+      return null;
+    }
     if (ctx.EnAfternoonWord()) {
       if(value.hour < 12) {
         value.hour += 12;
@@ -147,7 +169,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
 
   //// enDateNormal
-	visitEnDateNormal (ctx: EnDateNormalContext): AnalyzerValue {
+	visitEnDateNormal (ctx: EnDateNormalContext): AnalyzerValue | null {
     if (ctx.enWeekDay()) {
       return this.visit(ctx.enWeekDay());
     }
@@ -164,8 +186,11 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
 
   //// enTime
-	visitEnTimeNormal(ctx: EnTimeNormalContext): AnalyzerValue {
+	visitEnTimeNormal(ctx: EnTimeNormalContext): AnalyzerValue | null {
     const value = this.visit(ctx.stdTime()) as AnalyzerTimeValue;
+    if (!value) {
+      return null;
+    }
     if (ctx.EnAfternoonWord()) {
       if(value.hour < 12) {
         value.hour += 12;
@@ -174,10 +199,13 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     return value;
   };
   
-	visitEnTimeOClock(ctx: EnTimeOClockContext): AnalyzerValue {
+	visitEnTimeOClock(ctx: EnTimeOClockContext): AnalyzerValue | null {
     const now = new Date();
     now.setMinutes(0, 0, 0)
     let hour = parseToInt(ctx.DateNumber().text);
+    if (hour >= 24 || hour < 0) {
+      return null;
+    }
     if (ctx.EnAfternoonWord()) {
       if (hour < 12) {
         hour += 12;
@@ -214,26 +242,14 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   /// EnDateDayAroundAlias
   visitEnDateDayAroundAlias(ctx: EnDateDayAroundAliasContext): AnalyzerValue {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    now.setDate(now.getDate() + parseEnAroundWord(ctx.EnAroundWord()));
-    return new AnalyzerDateValue(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      ctx,
-    );
+    const time = new Date();
+    time.setDate(time.getDate() + parseEnAroundWord(ctx.EnAroundWord()));
+    return AnalyzerDateValue.fromDateTime(time, ctx);
   };
   visitEnDateDayAroundAlias_2(ctx: EnDateDayAroundAlias_2Context): AnalyzerValue {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    now.setDate(now.getDate() + parseEnAroundDayWord(ctx.EnAroundDayWord()));
-    return new AnalyzerDateValue(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      ctx,
-    );
+    const time = new Date();
+    time.setDate(time.getDate() + parseEnAroundDayWord(ctx.EnAroundDayWord()));
+    return AnalyzerDateValue.fromDateTime(time, ctx);
   };
 
   /// EnDateWeekAroundAlias
@@ -264,10 +280,10 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
   
-	visitEnMonthDay (ctx: EnMonthDayContext): AnalyzerDateValue {
+	visitEnMonthDay (ctx: EnMonthDayContext): AnalyzerDateValue | null {
     const month = this.visit(ctx.enMonth()) as AnalyzerDateValue;
     const day = parseEnDay(ctx.enDay());
-    if (day <= 0) {
+    if (!month || !day || day <= 0 || day > 31) {
       return null;
     }
     return new AnalyzerDateValue(

@@ -112,7 +112,7 @@ ZhCountMonth          : '个月';
 ZhDayWord             : '日';
 ZhDayWord_2           : '号' | '號';
 ZhTian                : '天';
-ZhWeekWord            : '周' | '个星期' | '星期';
+ZhWeekWord            : '周' | '週' | '个星期' | '星期';
 ZhHourWord            : '时' | '点' | '時' | '點';
 ZhHourWholeWord       : '整';
 ZhCountHour           : '个小时' | '小时' | '個小時' | '小時';
