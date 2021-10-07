@@ -7,5 +7,5 @@
 Go to [All Support Format Document](./docs/support-format.md), to see more support formats.
 
 ## Usage
-- [For Javascript](./javascript/README.MD)
-- [For Dart](./dart/README.MD)
+- [For Javascript](./javascript/README.md)
+- [For Dart](./dart/README.md)

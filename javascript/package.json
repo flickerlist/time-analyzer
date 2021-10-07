@@ -1,15 +1,33 @@
 {
   "name": "time-analyzer",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
+  "author": {
+    "name" : "Lanistor" ,
+    "email" : "lanistor@163.com",
+    "url" : "https://github.com/lanistor"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "http://github.com/flickerlist/time-analyzer.git",
+    "directory": "javascript"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "gen-parser": "antlr4ts -visitor lib/grammar/TimeLexer.g4 && antlr4ts -visitor lib/grammar/TimeParser.g4",
+    "build": "rm -rf lib && tsc -p tsconfig.build.json --declaration",
+    "gen-parser": "antlr4ts -visitor src/grammar/TimeLexer.g4 && antlr4ts -visitor src/grammar/TimeParser.g4",
     "pregen-parser": "yarn clean-parser",
-    "clean-parser": "rm -rf lib/grammar/*.interp lib/grammar/*.tokens lib/grammar/*.js lib/grammar/*.tokens lib/grammar/*.ts",
+    "pub-npm": "pushd lib && npm publish",
+    "prepub-npm": "yarn build && cp README.md package.json lib/ && rm -rf lib/*tsbuildinfo",
+    "clean-parser": "rm -rf src/grammar/*.interp src/grammar/*.tokens src/grammar/*.js src/grammar/*.tokens src/grammar/*.ts",
     "test": "jest"
   },
+  "keywords": [
+    "time",
+    "date",
+    "analyzer",
+    "parse"
+  ],
   "engines": {
     "node": ">=14"
   },

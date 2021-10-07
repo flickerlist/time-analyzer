@@ -143,7 +143,8 @@ expect(values[0]).toMatchObject({
 ## Development
 
 ### Technology
-> Use [Antlr4](https://www.antlr.org/) to parse text.
+1. Use [Antlr4](https://www.antlr.org/) to parse text.  
+2. Use [antlr4ts-cli](https://www.npmjs.com/package/antlr4ts-cli) to generate TypeScript files.  
 
 ### Steps
 1. Install [Antlr4](https://www.antlr.org/).

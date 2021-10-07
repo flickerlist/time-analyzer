@@ -2,25 +2,26 @@
   "allowSyntheticDefaultImports": false,
   "compilerOptions": {
     "module": "CommonJS",
-    "removeComments": true,
+    "target": "es2020",
+    "removeComments": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2020",
-    "sourceMap": true,
-    "outDir": "./lib",
-    "baseUrl": "./",
+    "sourceMap": false,
     "incremental": true,
     "allowJs": true,
+    "noEmit": false,
+    "outDir": "./lib",
+    "baseUrl": "./",
     "plugins": [
       {
         "transform": "ts-transform-paths"
       }
     ],
     "paths": {
-      "time-analyzer": ["src/index.ts"],
+      "time-analyzer": ["src/index"],
       "time-analyzer/*": ["src/*"],
     }
   },
   "include": ["src", "__test"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "lib"]
 }
