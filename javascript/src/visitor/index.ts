@@ -3,11 +3,14 @@ import { AnalyzerValue, AnalyzerValueArray } from "../model";
 import { EnTimeAnalyzerVisitor } from "./en";
 
 export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
-  visitProgram = (ctx: ProgramContext): AnalyzerValue => {
+  visitProgram(ctx: ProgramContext): AnalyzerValue {
+    if (!ctx.statementList()) {
+      return null;
+    }
     return this.visit(ctx.statementList());
   };
 
-  visitStatementList = (ctx: StatementListContext): AnalyzerValue => {
+  visitStatementList(ctx: StatementListContext): AnalyzerValue {
     const values: AnalyzerValue[] = [];
     const statements = ctx.statement();
     for (const item of statements) {
@@ -21,7 +24,7 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
     return new AnalyzerValueArray(values);
   };
 
-  visitStatement = (ctx: StatementContext): AnalyzerValue => {
+  visitStatement(ctx: StatementContext): AnalyzerValue {
     // Period
     if (ctx.zhPeriod()) {
       return this.visit(ctx.zhPeriod());

@@ -12,7 +12,7 @@
 $ npm install time-analyzer
 ```
 ```ts
-import { TimeAnalyzer, AnalyzerValue } from `time-analyzer`;
+import { TimeAnalyzer, AnalyzerValue } from 'time-analyzer';
 
 // for ts
 const values: AnalyzerValue[] = new TimeAnalyzer('March 3, 2022, 3:30 p.m.').values;
@@ -25,7 +25,7 @@ const { year, month, day, hour, minute, second, match, valueType } = values[0];
 ## Cases
 ### Parse DateTime
 ```ts
-import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from `time-analyzer`;
+import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from 'time-analyzer';
 
 // Case for english (ts-jest case)
 const text = 'March 3, 2022, 3:30 p.m.';
@@ -67,7 +67,7 @@ expect(values[0]).toMatchObject({
 ```
 ### Parse Period Date
 ```ts
-import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from `time-analyzer`;
+import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from 'time-analyzer';
 
 // Case for english (ts-jest case)
 const text = 'March 5th at 1 p.m. to Apr. 6th at 3 p.m.';

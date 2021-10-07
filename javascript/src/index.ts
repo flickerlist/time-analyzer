@@ -14,6 +14,9 @@ export class TimeAnalyzer {
   private value: AnalyzerValueArray;
   
   constructor(input: string) {
+    if (!input) {
+      return;
+    }
     const chars = CharStreams.fromString(input);
     const lexer = new TimeLexer(chars);
     const tokens = new CommonTokenStream(lexer);
@@ -26,12 +29,17 @@ export class TimeAnalyzer {
     
     this.value = this.visitor.visit(this.parser.program()) as AnalyzerValueArray;
 
-    this.value.values.forEach((item) => {
-      item.resetMatchText(input);
-    });
+
+    if (this.value) {
+      this.value.values.forEach((item) => {
+        item.resetMatchText(input);
+      });
+    }
   }
 
   get values(): AnalyzerValue[] {
-    return this.value?.values || [];
+    return this.value
+      ? (this.value.values || [])
+      : [];
   }
 }
