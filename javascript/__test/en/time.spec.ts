@@ -21,6 +21,33 @@ describe('En Time', () => {
     });
   });
 
+  test('Time Clock', () => {
+    expectTime({
+      text: '4 o’clock',
+      hour: 4,
+      minute: 0,
+      second: 0,
+    });
+  });
+
+  test('Time Clock', () => {
+    expectTime({
+      text: '4 o\'clock p.m.',
+      hour: 16,
+      minute: 0,
+      second: 0,
+    });
+  });
+
+  test('Time Clock', () => {
+    expectTime({
+      text: '4 of clock p.m.',
+      hour: 16,
+      minute: 0,
+      second: 0,
+    });
+  });
+
   test('Time', () => {
     expectTime({
       text: 'at 8 at night',

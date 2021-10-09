@@ -66,6 +66,7 @@
 - 1pm
 - at 5:30 p.m
 - at 4 o’clock
+- at 4 o'clock
 - at 8 at night
 - at 3:30:30 in the afternoon
 - 12:30 at noon

@@ -7,10 +7,74 @@
 1. Go to [All Support Format Document](../docs/support-format.md), to see more support formats.
 2. See [Test cases in __test](./__test).
 
+## API
+
+### parseFirst
+
+> Parse time from text, and result `AnalyzerQuickValue` instance.
+```ts
+parseFirst(string): AnalyzerQuickValue;
+```
+
+### parse
+
+> Parse time from text, and result multiple `AnalyzerQuickValue` instances.
+```ts
+parse(string): AnalyzerQuickValue[];
+```
+
+### TimeAnalyzer
+> Class TimeAnalyzer, For more flexible applications.
+```ts
+constructor(text: string)
+```
+
+
 ## Usage
 ```bash
 $ npm install time-analyzer
 ```
+### Simple usage
+```ts
+import { parseFirst, AnalyzerValue, parse } from 'time-analyzer';
+
+const text = '2021/7/1 1:30pm - 2022/7/1 3 o\'clock';
+const value: AnalyzerQuickValue = parseFirst(text);
+
+// ts-jest
+expect(value).toMatchObject({
+  start: new Date('2021-07-01T13:30:00'),
+  end: new Date('2022-07-01T03:00:00'),
+  onlyDate: false,
+  match: {
+    text,
+    startIndex: 0,
+    endIndex: text.length,
+  }
+});
+```
+
+```ts
+import { AnalyzerQuickValue, parse } from "time-analyzer";
+
+const text = '2021/7/1 13:15';
+const values: AnalyzerQuickValue[] = parse(text);
+
+// ts-jest
+expect(values).toHaveLength(1);
+expect(values[0]).toMatchObject({
+  start: new Date('2021-07-01T13:15:00'),
+  end: null,
+  onlyDate: false,
+  match: {
+    text,
+    startIndex: 0,
+    endIndex: text.length,
+  }
+});
+```
+
+### More flexible usage
 ```ts
 import { TimeAnalyzer, AnalyzerValue } from 'time-analyzer';
 
@@ -22,7 +86,9 @@ console.assert(values.length = 1);
 const { year, month, day, hour, minute, second, match, valueType } = values[0];
 ```
 
-## Cases
+## For different time formatrer
+> Use `TimeAnalyzer` for cases, `parse`, `parseFirst` have similar usage.
+
 ### Parse DateTime
 ```ts
 import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from 'time-analyzer';
@@ -67,11 +133,11 @@ expect(values[0]).toMatchObject({
 ```
 ### Parse Period Date
 ```ts
-import { TimeAnalyzer, AnalyzerValue, AnalyzerValueType } from 'time-analyzer';
+import { parse, AnalyzerValue, AnalyzerValueType } from 'time-analyzer';
 
 // Case for english (ts-jest case)
 const text = 'March 5th at 1 p.m. to Apr. 6th at 3 p.m.';
-const values = new TimeAnalyzer(text).values;
+const values: AnalyzerValue[] = new TimeAnalyzer(text).values;
 expect(values).toHaveLength(1);
 expect(values[0]).toMatchObject({
   valueType: AnalyzerValueType.PeriodDateTime,
@@ -102,7 +168,7 @@ expect(values[0]).toMatchObject({
 
 // Case for chinese
 const text = '明天下午1点45到後天上午3點';
-const values = new TimeAnalyzer(text).values;
+const values: AnalyzerValue[] = new TimeAnalyzer(text).values;
 expect(values).toHaveLength(1);
 
 const start = new Date();
@@ -136,6 +202,94 @@ expect(values[0]).toMatchObject({
     text: text,
   },
 });
+```
+
+## Models
+```ts
+interface AnalyzerQuickValue {
+  start: Date;
+  end: Date;
+  // only date (no time), such as '2021-07-01'. default 'false'
+  onlyDate: boolean;
+  match: null | {
+    text: string;
+    startIndex: number;
+    endIndex: number;
+  }
+}
+
+enum AnalyzerValueType {
+  DateTime = 'DateTime',
+  Date = 'Date',
+  Time = 'Time',
+  PeriodDateTime = 'PeriodDateTime',
+  PeriodDate = 'PeriodDate',
+  PeriodTime = 'PeriodTime',
+}
+
+class AnalyzerValue {
+  valueType: AnalyzerValueType;
+  match: MatchData;
+}
+
+class MatchData {
+  startIndex: number;
+  endIndex: number;
+  text: string;
+}
+
+class AnalyzerDateTimeValue extends AnalyzerValue {
+  valueType = AnalyzerValueType.DateTime;
+
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+class AnalyzerDateValue extends AnalyzerValue {
+  valueType = AnalyzerValueType.Date;
+
+  year: number;
+  month: number;
+  day: number;
+}
+
+class AnalyzerTimeValue extends AnalyzerValue {
+  valueType = AnalyzerValueType.Time;
+
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+class AbstractAnalyzerPeriodDateTimeValue<T extends AnalyzerValue> extends AnalyzerValue {
+  start: T = null;
+  end: T = null;
+}
+
+class AnalyzerPeriodDateTimeValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerDateTimeValue> {
+  valueType = AnalyzerValueType.PeriodDateTime;
+
+  start: AnalyzerDateTimeValue;
+  end: AnalyzerDateTimeValue;
+}
+
+class AnalyzerPeriodDateValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerDateValue> {
+  valueType = AnalyzerValueType.PeriodDate;
+
+  start: AnalyzerDateValue;
+  end: AnalyzerDateValue;
+}
+
+class AnalyzerPeriodTimeValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerTimeValue> {
+  valueType = AnalyzerValueType.PeriodTime;
+
+  start: AnalyzerTimeValue;
+  end: AnalyzerTimeValue;
+}
 ```
 
 ## Development

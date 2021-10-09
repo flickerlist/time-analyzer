@@ -39,9 +39,6 @@ export class MatchData {
   }
 }
 
-// remove useless match (at header or suffix)
-const uselessPrefixReg = /^[-~/:,]+/g;
-const uselessSuffixReg = /[-~/:,]+$/g;
 export abstract class AnalyzerValue {
   valueType: AnalyzerValueType;
   match: MatchData;
@@ -71,74 +68,6 @@ export abstract class AnalyzerValue {
       );
       this.match.text = text;
     }
-  }
-}
-
-export class AnalyzerDateValue extends AnalyzerValue {
-  constructor(
-    year: number,
-    month: number,
-    day: number,
-    context?: ParserRuleContext,
-  ) {
-    super({
-      valueType:  AnalyzerValueType.Date,
-      context: context,
-    });
-    this.year = year;
-    this.month = month;
-    this.day = day;
-  }
-
-  year: number = 0;
-  month: number = 0;
-  day: number = 0;
-
-  static fromDateTime(
-    dateTime: Date,
-    context?: ParserRuleContext,
-  ) {
-    return new AnalyzerDateValue(
-      dateTime.getFullYear(),
-      dateTime.getMonth(),
-      dateTime.getDate(),
-      context,
-    );
-  }
-}
-
-
-export class AnalyzerTimeValue extends AnalyzerValue {
-  constructor(
-    hour: number,
-    minute: number,
-    second: number = 0,
-    context?: ParserRuleContext,
-  ) {
-    super({
-      valueType:  AnalyzerValueType.Time,
-      context: context,
-    });
-    this.hour = hour;
-    this.minute = minute;
-    this.second = second;
-  }
-
-  valueType = AnalyzerValueType.Time;
-  hour: number = 0;
-  minute: number = 0;
-  second: number = 0;
-
-  static fromDateTime(
-    dateTime: Date,
-    context?: ParserRuleContext,
-  ) {
-    return new AnalyzerTimeValue(
-      dateTime.getHours(),
-      dateTime.getMinutes(),
-      dateTime.getSeconds(),
-      context,
-    );
   }
 }
 
@@ -207,35 +136,136 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
   second: number = 0;
 }
 
-// tool to create periodvalue's classes
-function createAnalyzerPeriodValueType<T extends AnalyzerValue>(valueType: AnalyzerValueType) {
-  return class extends AnalyzerValue {
-    constructor(
-      start: T,
-      end: T,
-      context?: ParserRuleContext,
-    ) {
-      super({
-        valueType,
-        context: context,
-      });
-      this.start = start;
-      this.end = end;
-    }
-  
-    start: T = null;
-    end: T = null;
+export class AnalyzerDateValue extends AnalyzerValue {
+  constructor(
+    year: number,
+    month: number,
+    day: number,
+    context?: ParserRuleContext,
+  ) {
+    super({
+      valueType: AnalyzerValueType.Date,
+      context: context,
+    });
+    this.year = year;
+    this.month = month;
+    this.day = day;
+  }
+
+  year: number = 0;
+  month: number = 0;
+  day: number = 0;
+
+  static fromDateTime(
+    dateTime: Date,
+    context?: ParserRuleContext,
+  ) {
+    return new AnalyzerDateValue(
+      dateTime.getFullYear(),
+      dateTime.getMonth(),
+      dateTime.getDate(),
+      context,
+    );
   }
 }
 
-export const AnalyzerPeriodDateTimeValue = 
-  createAnalyzerPeriodValueType<AnalyzerDateTimeValue>(AnalyzerValueType.PeriodDateTime);
+export class AnalyzerTimeValue extends AnalyzerValue {
+  constructor(
+    hour: number,
+    minute: number,
+    second: number = 0,
+    context?: ParserRuleContext,
+  ) {
+    super({
+      valueType:  AnalyzerValueType.Time,
+      context: context,
+    });
+    this.hour = hour;
+    this.minute = minute;
+    this.second = second;
+  }
 
-export const AnalyzerPeriodDateValue = 
-  createAnalyzerPeriodValueType<AnalyzerDateValue>(AnalyzerValueType.PeriodDate);
-  
-export const AnalyzerPeriodTimeValue = 
-  createAnalyzerPeriodValueType<AnalyzerTimeValue>(AnalyzerValueType.PeriodTime);
+  valueType = AnalyzerValueType.Time;
+  hour: number = 0;
+  minute: number = 0;
+  second: number = 0;
+
+  static fromDateTime(
+    dateTime: Date,
+    context?: ParserRuleContext,
+  ) {
+    return new AnalyzerTimeValue(
+      dateTime.getHours(),
+      dateTime.getMinutes(),
+      dateTime.getSeconds(),
+      context,
+    );
+  }
+}
+
+export class AbstractAnalyzerPeriodDateTimeValue<T extends AnalyzerValue> extends AnalyzerValue {
+  constructor(
+    valueType: AnalyzerValueType,
+    start: T,
+    end: T,
+    context?: ParserRuleContext,
+  ) {
+    super({
+      valueType,
+      context: context,
+    });
+    this.start = start;
+    this.end = end;
+  }
+
+  start: T = null;
+  end: T = null;
+}
+
+export class AnalyzerPeriodDateTimeValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerDateTimeValue> {
+  constructor(
+    start: AnalyzerDateTimeValue,
+    end: AnalyzerDateTimeValue,
+    context?: ParserRuleContext,
+  ) {
+    super(
+      AnalyzerValueType.PeriodDateTime,
+      start,
+      end,
+      context,
+    );
+  }
+}
+
+export class AnalyzerPeriodDateValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerDateValue> {
+  constructor(
+    start: AnalyzerDateValue,
+    end: AnalyzerDateValue,
+    context?: ParserRuleContext,
+  ) {
+    super(
+      AnalyzerValueType.PeriodDate,
+      start,
+      end,
+      context,
+    );
+  }
+}
+
+export class AnalyzerPeriodTimeValue extends AbstractAnalyzerPeriodDateTimeValue<AnalyzerTimeValue> {
+  constructor(
+    start: AnalyzerTimeValue,
+    end: AnalyzerTimeValue,
+    context?: ParserRuleContext,
+  ) {
+    super(
+      AnalyzerValueType.PeriodTime,
+      start,
+      end,
+      context,
+    );
+  }
+}
 
 // only use for visit result combined
 export class AnalyzerValueResult extends AnalyzerValue {

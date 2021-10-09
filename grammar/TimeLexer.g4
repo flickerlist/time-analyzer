@@ -67,7 +67,7 @@ EnAfternoonWord
     ;
 EnHourWholeWord
     : O F ' ' C L O C K
-    | O '\\' C L O C K
+    | O ('’' | '\'') C L O C K
     ;
 
 EnAtWord
