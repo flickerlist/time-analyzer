@@ -11,14 +11,14 @@
 
 ### parseFirst
 
-> Parse time from text, and result `AnalyzerQuickValue` instance.
+> Parse time from text, and return first `AnalyzerQuickValue` instance.
 ```ts
 parseFirst(string): AnalyzerQuickValue;
 ```
 
 ### parse
 
-> Parse time from text, and result multiple `AnalyzerQuickValue` instances.
+> Parse time from text, and return multiple `AnalyzerQuickValue` instances.
 ```ts
 parse(string): AnalyzerQuickValue[];
 ```
@@ -78,7 +78,6 @@ expect(values[0]).toMatchObject({
 ```ts
 import { TimeAnalyzer, AnalyzerValue } from 'time-analyzer';
 
-// for ts
 const values: AnalyzerValue[] = new TimeAnalyzer('March 3, 2022, 3:30 p.m.').values;
 
 console.assert(values.length = 1);
@@ -86,7 +85,7 @@ console.assert(values.length = 1);
 const { year, month, day, hour, minute, second, match, valueType } = values[0];
 ```
 
-## For different time formatrer
+## For different time formatter
 > Use `TimeAnalyzer` for cases, `parse`, `parseFirst` have similar usage.
 
 ### Parse DateTime
@@ -205,12 +204,13 @@ expect(values[0]).toMatchObject({
 ```
 
 ## Models
+> Useful models in parser.
+
 ```ts
 interface AnalyzerQuickValue {
   start: Date;
   end: Date;
-  // only date (no time), such as '2021-07-01'. default 'false'
-  onlyDate: boolean;
+  onlyDate: boolean; // if time is only date (with no time), such as '2021-07-01'. default 'false'
   match: null | {
     text: string;
     startIndex: number;
