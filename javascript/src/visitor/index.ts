@@ -1,5 +1,5 @@
 import { ProgramContext, StatementListContext, StatementContext } from "../grammar/TimeParser";
-import { AnalyzerValue, AnalyzerValueArray } from "../model";
+import { AnalyzerValue, AnalyzerValueResult } from "../model";
 import { EnTimeAnalyzerVisitor } from "./en";
 
 export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
@@ -21,7 +21,7 @@ export class TimeAnalyzerVisitor extends EnTimeAnalyzerVisitor {
       value.resetContext(item);
       values.push(value);
     }
-    return new AnalyzerValueArray(values);
+    return new AnalyzerValueResult(values);
   };
 
   visitStatement(ctx: StatementContext): AnalyzerValue {

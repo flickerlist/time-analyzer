@@ -1,4 +1,4 @@
-import { AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerUnexpectedError, AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue } from '../model';
+import { AnalyzerDateValue, AnalyzerUnexpectedError, AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerPeriodDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodTimeValue } from '../model';
 import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext } from "../grammar/TimeParser";
 import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
 import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodDateTimeToTime } from "./common.utils";
@@ -9,26 +9,24 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
   //// enPeriod
 	visitEnPeriodDateToDate(ctx: EnPeriodDateToDateContext): AnalyzerValue | null {
-    const start = this.visit(ctx.enDate()[0]);
-    const end = this.visit(ctx.enDate()[1]);
+    const start = this.visit(ctx.enDate()[0]) as AnalyzerDateValue;
+    const end = this.visit(ctx.enDate()[1]) as AnalyzerDateValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       start,
       end,
       ctx,
     );
   };
 	visitEnPeriodDateTimeToDateTime(ctx: EnPeriodDateTimeToDateTimeContext): AnalyzerValue | null {
-    const start = this.visit(ctx.enDateTime()[0]);
-    const end = this.visit(ctx.enDateTime()[1]);
+    const start = this.visit(ctx.enDateTime()[0]) as AnalyzerDateTimeValue;
+    const end = this.visit(ctx.enDateTime()[1]) as AnalyzerDateTimeValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.DateTime,
+    return new AnalyzerPeriodDateTimeValue(
       start,
       end,
       ctx,
@@ -52,8 +50,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       return null;
     }
     if (date) {
-      return new AnalyzerPeriodValue(
-        AnalyzerPeriodValueType.DateTime,
+      return new AnalyzerPeriodDateTimeValue(
         new AnalyzerDateTimeValue(
           date.year, date.month, date.day,
           start.hour, start.minute, start.second,
@@ -64,8 +61,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         ),
       )
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Time,
+    return new AnalyzerPeriodTimeValue(
       start,
       end,
       ctx,
@@ -88,8 +84,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     }
     const start = months[0];
     const end = months[1] || start;
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       new AnalyzerDateValue(
         start.year,
         start.month,
@@ -115,8 +110,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       aroundValue,
     );
     
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       startDate,
       endDate,
       ctx,
@@ -143,8 +137,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       endAroundValue,
     );
 
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       startDate,
       endDate,
       ctx,

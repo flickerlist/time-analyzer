@@ -15,17 +15,12 @@ export enum WeekStartDay {
 }
 
 export enum AnalyzerValueType {
-  Period = 'Period',
   DateTime = 'DateTime',
   Date = 'Date',
   Time = 'Time',
-  ValueArray = 'ValueArray',
-}
-
-export enum AnalyzerPeriodValueType {
-  DateTime = 'DateTime',
-  Date = 'Date',
-  Time = 'Time',
+  PeriodDateTime = 'PeriodDateTime',
+  PeriodDate = 'PeriodDate',
+  PeriodTime = 'PeriodTime',
 }
 
 // match data of text
@@ -78,28 +73,6 @@ export abstract class AnalyzerValue {
     }
   }
 }
-
-export class AnalyzerPeriodValue extends AnalyzerValue {
-  constructor(
-    periodType: AnalyzerPeriodValueType,
-    start: AnalyzerValue,
-    end: AnalyzerValue,
-    context?: ParserRuleContext,
-  ) {
-    super({
-      valueType:  AnalyzerValueType.Period,
-      context: context,
-    });
-    this.periodType = periodType;
-    this.start = start;
-    this.end = end;
-  }
-
-  periodType: AnalyzerPeriodValueType = null;
-  start: AnalyzerValue = null;
-  end: AnalyzerValue = null;
-}
-
 
 export class AnalyzerDateValue extends AnalyzerValue {
   constructor(
@@ -234,13 +207,43 @@ export class AnalyzerDateTimeValue extends AnalyzerValue {
   second: number = 0;
 }
 
+// tool to create periodvalue's classes
+function createAnalyzerPeriodValueType<T extends AnalyzerValue>(valueType: AnalyzerValueType) {
+  return class extends AnalyzerValue {
+    constructor(
+      start: T,
+      end: T,
+      context?: ParserRuleContext,
+    ) {
+      super({
+        valueType,
+        context: context,
+      });
+      this.start = start;
+      this.end = end;
+    }
+  
+    start: T = null;
+    end: T = null;
+  }
+}
+
+export const AnalyzerPeriodDateTimeValue = 
+  createAnalyzerPeriodValueType<AnalyzerDateTimeValue>(AnalyzerValueType.PeriodDateTime);
+
+export const AnalyzerPeriodDateValue = 
+  createAnalyzerPeriodValueType<AnalyzerDateValue>(AnalyzerValueType.PeriodDate);
+  
+export const AnalyzerPeriodTimeValue = 
+  createAnalyzerPeriodValueType<AnalyzerTimeValue>(AnalyzerValueType.PeriodTime);
+
 // only use for visit result combined
-export class AnalyzerValueArray extends AnalyzerValue {
+export class AnalyzerValueResult extends AnalyzerValue {
   constructor(
     values: AnalyzerValue[] = [],
   ) {
     super({
-      valueType:  AnalyzerValueType.ValueArray,
+      valueType: null,
     });
     this.values = values;
   }
@@ -248,6 +251,7 @@ export class AnalyzerValueArray extends AnalyzerValue {
   values: AnalyzerValue[];
 }
 
+// error
 export class AnalyzerUnexpectedError extends Error {
   constructor() {
     super('Unexpected error');

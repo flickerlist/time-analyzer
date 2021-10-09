@@ -1,6 +1,6 @@
 import { parseEnWeekValueToDate } from 'time-analyzer/visitor/en.utils';
 import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
+import { TimeAnalyzer, AnalyzerValueType } from 'time-analyzer';
 
 describe('En Period Time', () => {
 
@@ -9,8 +9,7 @@ describe('En Period Time', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: getCurrentYear(),
@@ -42,8 +41,7 @@ describe('En Period Time', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: getCurrentYear(),
@@ -81,8 +79,7 @@ describe('En Period Time', () => {
 
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: start.getFullYear(),
@@ -117,8 +114,7 @@ describe('En Period Time', () => {
 
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: date.year,
@@ -152,8 +148,7 @@ describe('En Period Time', () => {
 
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: date.year,

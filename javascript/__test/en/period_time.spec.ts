@@ -1,4 +1,4 @@
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
+import { TimeAnalyzer, AnalyzerValueType } from 'time-analyzer';
 
 describe('En Period Time', () => {
 
@@ -7,8 +7,7 @@ describe('En Period Time', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Time,
+      valueType: AnalyzerValueType.PeriodTime,
       start: {
         valueType: AnalyzerValueType.Time,
         hour: 13,
@@ -34,8 +33,7 @@ describe('En Period Time', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Time,
+      valueType: AnalyzerValueType.PeriodTime,
       start: {
         valueType: AnalyzerValueType.Time,
         hour: 1,
@@ -62,8 +60,7 @@ describe('En Period Time', () => {
     const values = new TimeAnalyzer(fullText).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Time,
+      valueType: AnalyzerValueType.PeriodTime,
       start: {
         valueType: AnalyzerValueType.Time,
         hour: 1,

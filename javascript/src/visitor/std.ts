@@ -1,5 +1,5 @@
 import { StdDateTimeContext, StdDateContext, StdTimeContext, StdPeriodDateToDateContext, StdPeriodTimeToTimeContext, StdPeriodDateTimeToTimeContext, StdPeriodDateTimeToDateTimeContext } from "../grammar/TimeParser";
-import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType } from "../model";
+import { AnalyzerValue, AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodTimeValue } from "../model";
 import { BasicTimeAnalyzerVisitor } from "./basic";
 import { getCurrentYear, parsePeriodDateTimeToTime, parseYearValue } from "./common.utils";
 import { parseToInt, parseToMonthValue } from "../utils/convert";
@@ -7,13 +7,12 @@ import { parseToInt, parseToMonthValue } from "../utils/convert";
 export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
 
 	visitStdPeriodDateToDate(ctx: StdPeriodDateToDateContext): AnalyzerValue | null {
-    const start = this.visit(ctx.stdDate()[0]);
-    const end = this.visit(ctx.stdDate()[1]);
+    const start = this.visit(ctx.stdDate()[0]) as AnalyzerDateValue;
+    const end = this.visit(ctx.stdDate()[1]) as AnalyzerDateValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       start,
       end,
       ctx,
@@ -21,13 +20,12 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
   };
 
 	visitStdPeriodDateTimeToDateTime(ctx: StdPeriodDateTimeToDateTimeContext): AnalyzerValue | null {
-    const start = this.visit(ctx.stdDateTime()[0]);
-    const end = this.visit(ctx.stdDateTime()[1]);
+    const start = this.visit(ctx.stdDateTime()[0]) as AnalyzerDateTimeValue;
+    const end = this.visit(ctx.stdDateTime()[1]) as AnalyzerDateTimeValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.DateTime,
+    return new AnalyzerPeriodDateTimeValue(
       start,
       end,
       ctx,
@@ -53,8 +51,7 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
       return null;
     }
     if (date) {
-      return new AnalyzerPeriodValue(
-        AnalyzerPeriodValueType.DateTime,
+      return new AnalyzerPeriodDateTimeValue(
         new AnalyzerDateTimeValue(
           date.year, date.month, date.day,
           start.hour, start.minute, start.second,
@@ -66,8 +63,7 @@ export class StdTimeAnalyzerVisitor extends BasicTimeAnalyzerVisitor {
         ctx,
       );
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Time,
+    return new AnalyzerPeriodTimeValue(
       start,
       end,
       ctx,

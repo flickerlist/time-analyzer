@@ -74,8 +74,7 @@ const text = 'March 5th at 1 p.m. to Apr. 6th at 3 p.m.';
 const values = new TimeAnalyzer(text).values;
 expect(values).toHaveLength(1);
 expect(values[0]).toMatchObject({
-  valueType: AnalyzerValueType.Period,
-  periodType: AnalyzerPeriodValueType.DateTime,
+  valueType: AnalyzerValueType.PeriodDateTime,
   start: {
     valueType: AnalyzerValueType.DateTime,
     year: 2021, // match current year
@@ -112,8 +111,7 @@ start.setDate(start.getDate() + 1);
 end.setDate(end.getDate() + 2);
 
 expect(values[0]).toMatchObject({
-  valueType: AnalyzerValueType.Period,
-  periodType: AnalyzerPeriodValueType.DateTime,
+  valueType: AnalyzerValueType.PeriodDateTime,
   start: {
     valueType: AnalyzerValueType.DateTime,
     year: start.getFullYear(),

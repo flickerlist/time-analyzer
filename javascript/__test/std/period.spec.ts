@@ -1,5 +1,5 @@
 import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
+import { TimeAnalyzer, AnalyzerValueType } from 'time-analyzer';
 
 describe('Standard Period', () => {
   
@@ -7,8 +7,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('2022-07-01~2022-07-05').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2022,
@@ -33,8 +32,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('07-01~07-05').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2021,
@@ -59,8 +57,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('07-01 15:30-16:30').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: 2021,
@@ -91,8 +88,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('15:30-16:30, 2022-07-01').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: 2022,
@@ -123,8 +119,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('15:30-16:30, 07-01').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: getCurrentYear(),
@@ -155,7 +150,7 @@ describe('Standard Period', () => {
     const values = new TimeAnalyzer('15:30-16:30').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
+      valueType: AnalyzerValueType.PeriodTime,
       start: {
         valueType: AnalyzerValueType.Time,
         hour: 15,

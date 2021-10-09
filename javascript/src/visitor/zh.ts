@@ -1,5 +1,5 @@
 import { ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhTimeNormalContext, ZhWeekDayContext, ZhYearContext, ZhPeriodDateToDateContext, ZhPeriodDateTimeToDateTimeContext, ZhPeriodDateTimeToTimeContext, ZhPeriodTimeToTimeContext, ZhPeriodMonthDayToMonthDayContext } from "../grammar/TimeParser";
-import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, AnalyzerUnexpectedError, AnalyzerValue, WeekValues } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerUnexpectedError, AnalyzerValue, WeekValues } from "../model";
 import { StdTimeAnalyzerVisitor } from "./std";
 import { computedAroundTime, getCurrentYear, parsePeriodDateTimeToTime } from "./common.utils";
 import { parseZhAroundAliasMark, parseZhDateValue, parseZhDay, parseZhNumberValue, parseZhStepAliasMark, parseZhWeekValue, parseZhWeekValueToDate, parseZhYearValue, zhTimeHasPerioldAliasMark, zhTimeIsAfternoon } from "./zh.utils";
@@ -17,8 +17,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
 
     const offsetWeeks = parseZhNumberValue(ctx.zhNumberValue())* parseZhStepAliasMark(ctx.zhStepAliasMark());
 
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       parseZhWeekValueToDate(startWeekDay as WeekValues, offsetWeeks),
       parseZhWeekValueToDate(endWeekDay as WeekValues, offsetWeeks),
       ctx,
@@ -39,8 +38,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       ? parseZhAroundAliasMark(ctx.zhAroundAliasMark()[1])
       : startOffsetWeeks;
 
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       parseZhWeekValueToDate(startWeekDay as WeekValues, startOffsetWeeks),
       parseZhWeekValueToDate(endWeekDay as WeekValues, endOffsetWeeks),
       ctx,
@@ -64,8 +62,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     const start = months[0];
     const end = months[1] || start;
 
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       new AnalyzerDateValue(
         start.year, start.month, days[0],
       ),
@@ -76,13 +73,12 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     );
   };
   visitZhPeriodDateToDate(ctx: ZhPeriodDateToDateContext): AnalyzerValue {
-    const start = this.visit(ctx.zhDate()[0]);
-    const end = this.visit(ctx.zhDate()[1]);
+    const start = this.visit(ctx.zhDate()[0]) as AnalyzerDateValue;
+    const end = this.visit(ctx.zhDate()[1]) as AnalyzerDateValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Date,
+    return new AnalyzerPeriodDateValue(
       start,
       end,
       ctx,
@@ -90,13 +86,12 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   };
 
 	visitZhPeriodDateTimeToDateTime(ctx: ZhPeriodDateTimeToDateTimeContext): AnalyzerValue {
-    const start = this.visit(ctx.zhDateTime()[0]);
-    const end = this.visit(ctx.zhDateTime()[1]);
+    const start = this.visit(ctx.zhDateTime()[0]) as AnalyzerDateTimeValue;
+    const end = this.visit(ctx.zhDateTime()[1]) as AnalyzerDateTimeValue;
     if (!start || !end) {
       return null;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.DateTime,
+    return new AnalyzerPeriodDateTimeValue(
       start,
       end,
       ctx,
@@ -132,8 +127,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       && end.hour < 12) {
       end.hour += 12;
     }
-    return new AnalyzerPeriodValue(
-      AnalyzerPeriodValueType.Time,
+    return new AnalyzerPeriodTimeValue(
       start,
       end,
       ctx,

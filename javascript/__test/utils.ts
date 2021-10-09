@@ -1,5 +1,5 @@
 import { TimeAnalyzer } from "time-analyzer";
-import { AnalyzerDateValue, AnalyzerPeriodValueType, AnalyzerValue, AnalyzerValueType, WeekStartDay, WeekValues } from "time-analyzer/model";
+import { AnalyzerDateValue, AnalyzerValue, AnalyzerValueType, WeekStartDay, WeekValues } from "time-analyzer/model";
 import { convertWeekDay } from "time-analyzer/visitor/common.utils";
 
 // expect date
@@ -213,8 +213,7 @@ export function expectWeekPeriod(
   matchStart = 0,
 ) {
   expect(value).toMatchObject({
-    valueType: AnalyzerValueType.Period,
-    periodType: AnalyzerPeriodValueType.Date,
+    valueType: AnalyzerValueType.PeriodDate,
     start: {
       valueType: datePeriod.start.valueType,
       year: datePeriod.start.year,

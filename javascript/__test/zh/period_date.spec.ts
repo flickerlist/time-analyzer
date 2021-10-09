@@ -1,5 +1,5 @@
 import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
-import { AnalyzerPeriodValueType, AnalyzerValueType, TimeAnalyzer } from 'time-analyzer';
+import { AnalyzerValueType, TimeAnalyzer } from 'time-analyzer';
 
 describe('Zh Period Date', () => {
 
@@ -8,8 +8,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear(),
@@ -35,8 +34,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 1,
@@ -68,8 +66,7 @@ describe('Zh Period Date', () => {
     endDate.setDate(endDate.getDate() + 3);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: startDate.getFullYear(),
@@ -99,8 +96,7 @@ describe('Zh Period Date', () => {
     startDate.setDate(startDate.getDate() + 1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: startDate.getFullYear(),
@@ -126,8 +122,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2002,
@@ -153,8 +148,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear(),
@@ -181,8 +175,7 @@ describe('Zh Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 1,
@@ -208,8 +201,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2022,
@@ -235,8 +227,7 @@ describe('Zh Period Date', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 3,
@@ -264,8 +255,7 @@ describe('Zh Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 16,

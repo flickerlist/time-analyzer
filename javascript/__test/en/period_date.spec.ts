@@ -1,5 +1,5 @@
 import { getCurrentYear } from 'time-analyzer/visitor/common.utils';
-import { TimeAnalyzer, AnalyzerValueType, AnalyzerPeriodValueType } from 'time-analyzer';
+import { TimeAnalyzer, AnalyzerValueType } from 'time-analyzer';
 
 describe('En Period Date', () => {
 
@@ -7,8 +7,7 @@ describe('En Period Date', () => {
     const values = new TimeAnalyzer('March 3-5, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2002,
@@ -33,8 +32,7 @@ describe('En Period Date', () => {
     const values = new TimeAnalyzer('March 3rd-5th, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2002,
@@ -59,8 +57,7 @@ describe('En Period Date', () => {
     const values = new TimeAnalyzer('March 3rd to 5th, 2002').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2002,
@@ -85,8 +82,7 @@ describe('En Period Date', () => {
     const values = new TimeAnalyzer('March 3 to 5').values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear(),
@@ -115,8 +111,7 @@ describe('En Period Date', () => {
     date.setMonth(date.getMonth() + 1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: date.getFullYear(),
@@ -145,8 +140,7 @@ describe('En Period Date', () => {
     date.setMonth(date.getMonth() + 1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: date.getFullYear(),
@@ -173,8 +167,7 @@ describe('En Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: 2022,
@@ -201,8 +194,7 @@ describe('En Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 1,
@@ -229,8 +221,7 @@ describe('En Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 3,
@@ -258,8 +249,7 @@ describe('En Period Date', () => {
     expect(values).toHaveLength(1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.Date,
+      valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
         year: getCurrentYear() + 3,

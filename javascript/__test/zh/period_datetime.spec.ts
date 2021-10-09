@@ -1,5 +1,5 @@
 import { parseZhWeekValueToDate } from 'time-analyzer/visitor/zh.utils';
-import { TimeAnalyzer, AnalyzerPeriodValueType, AnalyzerValueType } from "time-analyzer";
+import { TimeAnalyzer, AnalyzerValueType } from "time-analyzer";
 import { getCurrentYear } from "time-analyzer/visitor/common.utils";
 
 describe('Zh Period DateTime', () => {
@@ -9,8 +9,7 @@ describe('Zh Period DateTime', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: getCurrentYear(),
@@ -42,8 +41,7 @@ describe('Zh Period DateTime', () => {
     const values = new TimeAnalyzer(text).values;
     expect(values).toHaveLength(1);
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: getCurrentYear(),
@@ -81,8 +79,7 @@ describe('Zh Period DateTime', () => {
     end.setDate(end.getDate() + 2);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: start.getFullYear(),
@@ -117,8 +114,7 @@ describe('Zh Period DateTime', () => {
     const date = parseZhWeekValueToDate(5, 1);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: date.year,
@@ -154,8 +150,7 @@ describe('Zh Period DateTime', () => {
     const endDate = parseZhWeekValueToDate(7, 2);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: startDate.year,
@@ -192,8 +187,7 @@ describe('Zh Period DateTime', () => {
     const endDate = parseZhWeekValueToDate(7, 2);
 
     expect(values[0]).toMatchObject({
-      valueType: AnalyzerValueType.Period,
-      periodType: AnalyzerPeriodValueType.DateTime,
+      valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
         year: startDate.year,

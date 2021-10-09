@@ -1,5 +1,5 @@
 import { ParserRuleContext } from "antlr4ts";
-import { AnalyzerDateTimeValue, AnalyzerPeriodValue, AnalyzerPeriodValueType, AnalyzerTimeValue, WeekValues, StepOffsetType, AnalyzerUnexpectedError, WeekStartDay, AnalyzerValue } from "../model";
+import { AnalyzerDateTimeValue, AnalyzerTimeValue, WeekValues, StepOffsetType, AnalyzerUnexpectedError, WeekStartDay, AnalyzerValue, AnalyzerPeriodDateTimeValue } from "../model";
 import { NumberValueContext, YearValueContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
 
@@ -21,8 +21,7 @@ export function parsePeriodDateTimeToTime(
     endTime.second,
   );
   
-  return new AnalyzerPeriodValue(
-    AnalyzerPeriodValueType.DateTime,
+  return new AnalyzerPeriodDateTimeValue(
     startDateTime,
     endDateTime,
     ctx,
