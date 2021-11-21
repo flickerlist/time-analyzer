@@ -162,7 +162,7 @@ ZhFrom                : '从';
 //// common
 YearNumber            : [1-9][0-9][0-9][0-9];
 DateNumber            : [0-9]?[0-9];
-NormalNumber           : [1-9][0-9]*;
+NormalNumber          : [1-9][0-9]*;
 
 MiddelConnectorWord   : '-';
 MiddelConnectorCurve  : '~';
