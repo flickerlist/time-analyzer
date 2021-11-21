@@ -151,7 +151,7 @@ ZhSecondWord          : '秒';
 ZhCountSecond         : '秒钟' | '秒鐘';
 ZhHalf                : '半';
 
-ZhMorningWord         : '凌晨' | '上午' | '中午' | '淩晨'; // Useless
+ZhMorningWord         : '凌晨' | '上午' | '早上' | '中午' | '淩晨'; // Useless
 ZhAfternoonWord       : '下午' | '晚上';
 
 ZhToWord              : '至' | '到';
