@@ -1,3 +1,4 @@
+import { EnTimeValueContext } from './../grammar/TimeParser';
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { EnDayContext, EnStepAliasMarkContext } from "../grammar/TimeParser";
 import { parseToInt } from "../utils/convert";
@@ -138,6 +139,67 @@ export function parseEnWeekValue(ctx: TerminalNode): WeekValues {
       throw new Error('Unexpected error');
   }
   return convertWeekDay(value);
+}
+
+/**
+ * parse enTimeValue
+ */
+export function parseEnTimeValue(enTimeValue: EnTimeValueContext): number {
+  if (enTimeValue.DateNumber()) {
+    return parseToInt(enTimeValue.DateNumber().text);
+  }
+  switch(enTimeValue.EnNumberValue().text.toUpperCase()) {
+    case 'ZERO':
+      return 0;
+    case 'ONE':
+      return 1;
+    case 'TWO':
+      return 2;
+    case 'THREE':
+      return 3;
+    case 'FOUR':
+      return 4;
+    case 'FIVE':
+      return 5;
+    case 'SIX':
+      return 6;
+    case 'SEVEN':
+      return 7;
+    case 'EIGHT':
+      return 8;
+    case 'NINE':
+      return 9;
+    case 'TEN':
+      return 10;
+    case 'ELEVENT':
+      return 11;
+    case 'TWELVE':
+      return 12;
+    case 'THIRTEEN':
+      return 13;
+    case 'FOURTEEN':
+      return 14;
+    case 'FIFTEEN':
+      return 15;
+    case 'SIXTEEN':
+      return 16;
+    case 'SEVENTEEN':
+      return 17;
+    case 'EIGHTEEN':
+      return 18;
+    case 'NINETEEN':
+      return 19;
+    case 'TWENTY':
+      return 20;
+    case 'TWENTY-ONE':
+      return 21;
+    case 'TWENTY-TWO':
+      return 22;
+    case 'TWENTY-THREE':
+      return 23;
+    default: // never reach code
+      return 0;
+  }
 }
 
 /**

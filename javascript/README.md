@@ -36,7 +36,7 @@ $ npm install time-analyzer
 ```
 ### Simple usage
 ```ts
-import { parseFirst, AnalyzerValue, parse } from 'time-analyzer';
+import { parseFirst, AnalyzerValue, parse, AnalyzerValueType } from 'time-analyzer';
 
 const text = '2021/7/1 1:30pm - 2022/7/1 3 o\'clock';
 const value: AnalyzerQuickValue = parseFirst(text);
@@ -45,7 +45,7 @@ const value: AnalyzerQuickValue = parseFirst(text);
 expect(value).toMatchObject({
   start: new Date('2021-07-01T13:30:00'),
   end: new Date('2022-07-01T03:00:00'),
-  onlyDate: false,
+  valueType: AnalyzerValueType.DateTime,
   match: {
     text,
     startIndex: 0,
@@ -65,7 +65,7 @@ expect(values).toHaveLength(1);
 expect(values[0]).toMatchObject({
   start: new Date('2021-07-01T13:15:00'),
   end: null,
-  onlyDate: false,
+  valueType: AnalyzerValueType.DateTime,
   match: {
     text,
     startIndex: 0,
@@ -210,7 +210,7 @@ expect(values[0]).toMatchObject({
 interface AnalyzerQuickValue {
   start: Date;
   end: Date;
-  onlyDate: boolean; // if time is only date (with no time), such as '2021-07-01'. default 'false'
+  valueType: AnalyzerValueType; // 'DateTime' | 'Date' | 'Time' | null
   match: null | {
     text: string;
     startIndex: number;

@@ -1,5 +1,9 @@
 import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerValueType, TimeAnalyzer } from "time-analyzer";
 
+export enum AnalyzerQuickValueType {
+
+}
+
 /**
  * quick parse functions to use.
  */
@@ -7,8 +11,10 @@ import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, 
 export interface AnalyzerQuickValue {
   start: Date;
   end: Date;
-  // only date (no time), such as '2021-07-01'. default 'false'
-  onlyDate: boolean;
+  valueType: AnalyzerValueType.DateTime
+    | AnalyzerValueType.Date
+    | AnalyzerValueType.Time
+    | null;
   match: null | {
     text: string;
     startIndex: number;
@@ -30,12 +36,12 @@ export function parseFirst(text: string): AnalyzerQuickValue {
 export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickValue {
   let start: Date = null;
   let end: Date = null;
-  let onlyDate = false;
+  let valueType = null;
   if (!value) {
     return {
       start: null,
       end: null,
-      onlyDate: false,
+      valueType,
       match: null,
     };
   }
@@ -52,7 +58,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         (value as AnalyzerDateTimeValue).minute,
       );
       end = null;
-      onlyDate = false;
+      valueType = AnalyzerValueType.DateTime;
       break;
     case AnalyzerValueType.Date:
       start = new Date(
@@ -61,7 +67,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         (value as AnalyzerDateValue).day,
       );
       end = null;
-      onlyDate = true;
+      valueType = AnalyzerValueType.Date;
       break;
     case AnalyzerValueType.Time:
       start = new Date(
@@ -72,7 +78,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         (value as AnalyzerTimeValue).minute,
       );
       end = null;
-      onlyDate = false;
+      valueType = AnalyzerValueType.Time;
       break;
     case AnalyzerValueType.PeriodDateTime:
       const _startDateTime = (value as AnalyzerPeriodDateTimeValue).start as AnalyzerDateTimeValue;
@@ -91,7 +97,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         _endDateTime.hour,
         _endDateTime.minute,
       );
-      onlyDate = false;
+      valueType = AnalyzerValueType.DateTime;
       break;
     case AnalyzerValueType.PeriodDate:
       const _startDate = (value as AnalyzerPeriodDateValue).start as AnalyzerDateValue;
@@ -106,7 +112,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         _endDate.month,
         _endDate.day,
       );
-      onlyDate = true;
+      valueType = AnalyzerValueType.Date;
       break;
     case AnalyzerValueType.PeriodTime:
       const _startTime = (value as AnalyzerPeriodTimeValue).start as AnalyzerTimeValue;
@@ -125,7 +131,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
         _endTime.hour,
         _endTime.minute,
       );
-      onlyDate = false;
+      valueType = AnalyzerValueType.Time;
       break;
     default:
       break;
@@ -134,7 +140,7 @@ export function valueToAnalyzerQuickValue (value: AnalyzerValue): AnalyzerQuickV
   return {
     start,
     end,
-    onlyDate,
+    valueType,
     match: value.match,
   };
 }

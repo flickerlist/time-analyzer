@@ -1,9 +1,8 @@
 import { AnalyzerDateValue, AnalyzerUnexpectedError, AnalyzerDateTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerPeriodDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodTimeValue } from '../model';
-import { EnTimeHourStepContext, EnTimeMinuteStepContext, EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeNormalContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext } from "../grammar/TimeParser";
-import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
+import { EnDateDayAroundAliasContext, EnDateDayAroundAlias_2Context, EnDateWeekAroundAliasContext, EnDateDayAroundStepContext, EnDateWeekAroundStepContext, EnMonthDayContext, EnPeriodTimeToTimeContext, EnPeriodDateToDateContext, EnDateNormalContext, EnDateTimeContext, EnTimeOClockContext, EnMonthContext, EnYearContext, EnPeriodMonthDayToMonthDayContext, EnPeriodWeek_1Context, EnPeriodWeek_2Context, EnPeriodDateTimeToDateTimeContext, EnPeriodDateTimeToTimeContext, EnTimeStdNormalContext, EnDirectTimeHourStepContext, EnDirectTimeMinuteStepContext, EnDateDayAroundHalfMonthContext, EnTimeHalfContext, EnDirectTimeHalfDayStepContext, EnDirectTimeHalfHourStepContext } from "../grammar/TimeParser";
+import { parseEnAroundDayWord, parseEnAroundWord, parseEnDay, parseEnMonthValue, parseEnStepAliasMark, parseEnTimeValue, parseEnWeekValue, parseEnWeekValueToDate } from "./en.utils";
 import { computedAroundTime, getCurrentYear, parseNumberValueContext, parseYearValue, parsePeriodDateTimeToTime } from "./common.utils";
 import { ZhTimeAnalyzerVisitor } from "./zh";
-import { parseToInt } from '../utils/convert';
 
 export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
 
@@ -179,7 +178,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
 
   //// enTime
-	visitEnTimeNormal(ctx: EnTimeNormalContext): AnalyzerValue | null {
+	visitEnTimeStdNormal(ctx: EnTimeStdNormalContext): AnalyzerValue | null {
     const value = this.visit(ctx.stdTime()) as AnalyzerTimeValue;
     if (!value) {
       return null;
@@ -193,9 +192,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
   
 	visitEnTimeOClock(ctx: EnTimeOClockContext): AnalyzerValue | null {
-    const now = new Date();
-    now.setMinutes(0, 0, 0)
-    let hour = parseToInt(ctx.DateNumber().text);
+    let hour = parseEnTimeValue(ctx.enTimeValue());
     if (hour >= 24 || hour < 0) {
       return null;
     }
@@ -204,13 +201,32 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
         hour += 12;
       }
     }
+    const now = new Date();
     now.setHours(hour);
+    now.setMinutes(0, 0, 0);
     return AnalyzerTimeValue.fromDateTime(now, ctx);
   };
 
+  visitEnTimeHalf(ctx: EnTimeHalfContext): AnalyzerValue | null {
+    let hour = parseEnTimeValue(ctx.enTimeValue());
+    if (hour >= 24 || hour < 0) {
+      return null;
+    }
+    if (ctx.EnAfternoonWord()) {
+      if (hour < 12) {
+        hour += 12;
+      }
+    }
+    const now = new Date();
+    now.setMinutes(30, 0, 0)
+    now.setHours(hour);
+    return AnalyzerTimeValue.fromDateTime(now, ctx);
+  }
+
+
   //// enDirectTimeAround
 
-  visitEnTimeHourStep (ctx: EnTimeHourStepContext): AnalyzerValue {
+  visitEnDirectTimeHourStep (ctx: EnDirectTimeHourStepContext): AnalyzerValue {
     const values = ctx.numberValue().map((item) => parseNumberValueContext(item));
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
@@ -221,7 +237,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
 
-  visitEnTimeMinuteStep(ctx: EnTimeMinuteStepContext): AnalyzerValue {
+  visitEnDirectTimeMinuteStep(ctx: EnDirectTimeMinuteStepContext): AnalyzerValue {
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
         parseEnStepAliasMark(ctx.enStepAliasMark()),
@@ -230,6 +246,26 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       ctx,
     );
   };
+
+  visitEnDirectTimeHalfDayStep(ctx: EnDirectTimeHalfDayStepContext): AnalyzerValue {
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseEnStepAliasMark(ctx.enStepAliasMark()),
+        { hour: 12 },
+      ),
+      ctx,
+    );
+  }
+
+	visitEnDirectTimeHalfHourStep(ctx: EnDirectTimeHalfHourStepContext): AnalyzerValue {
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseEnStepAliasMark(ctx.enStepAliasMark()),
+        { minute: 30 },
+      ),
+      ctx,
+    );
+  }
 
   //// enDateAround
 
@@ -263,6 +299,17 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     return AnalyzerDateValue.fromDateTime(now, ctx);
   };
 
+  /// EnDateDayAroundHalfMonth
+  visitEnDateDayAroundHalfMonth(ctx: EnDateDayAroundHalfMonthContext): AnalyzerValue {
+    return AnalyzerDateValue.fromDateTime(
+      computedAroundTime(
+        parseEnStepAliasMark(ctx.enStepAliasMark()),
+        { day: 15 },
+      ),
+      ctx,
+    );
+  };
+
   /// EnDateWeekAroundStep
   visitEnDateWeekAroundStep(ctx: EnDateWeekAroundStepContext): AnalyzerValue {
     return parseEnWeekValueToDate(
@@ -273,7 +320,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
     );
   };
   
-	visitEnMonthDay (ctx: EnMonthDayContext): AnalyzerDateValue | null {
+	visitEnMonthDay(ctx: EnMonthDayContext): AnalyzerDateValue | null {
     const month = this.visit(ctx.enMonth()) as AnalyzerDateValue;
     const day = parseEnDay(ctx.enDay());
     if (!month || !day || day <= 0 || day > 31) {
@@ -316,6 +363,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
   };
 
 	visitEnMonth(ctx: EnMonthContext): AnalyzerDateValue {
+    // e.g.: next month
     if (ctx.EnAroundWord() && ctx.EnMonthWord()) {
       const date = new Date();
       date.setMonth(date.getMonth() + parseEnAroundWord(ctx.EnAroundWord()));
@@ -326,6 +374,7 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       );
     }
 
+    // e.g.: April | next April
     if (ctx.EnMonthValue()) {
       const date = new Date();
       date.setMonth(parseEnMonthValue(ctx.EnMonthValue()));
@@ -339,13 +388,25 @@ export class EnTimeAnalyzerVisitor extends ZhTimeAnalyzerVisitor {
       );
     }
 
+    // e.g.: 3 months later | after 3 months
     if (ctx.numberValue()) {
-      const date = new Date();
-      date.setMonth(date.getMonth() + parseNumberValueContext(ctx.numberValue()) * parseEnStepAliasMark(ctx.enStepAliasMark()));
-      return new AnalyzerDateValue(
-        date.getFullYear(),
-        date.getMonth(),
-        0,
+      return AnalyzerDateValue.fromDateTime(
+        computedAroundTime(
+          parseEnStepAliasMark(ctx.enStepAliasMark()),
+          { month: parseNumberValueContext(ctx.numberValue()) },
+        ),
+        ctx,
+      );
+    }
+
+    // e.g.: half a year later
+    if (ctx.EnHalf()) {
+      return AnalyzerDateValue.fromDateTime(
+        computedAroundTime(
+          parseEnStepAliasMark(ctx.enStepAliasMark()),
+          { month: 6 },
+        ),
+        ctx,
       );
     }
     throw new AnalyzerUnexpectedError();

@@ -1,4 +1,4 @@
-import { ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhTimeHourStepContext, ZhTimeMinuteStepContext, ZhTimeNormalContext, ZhWeekDayContext, ZhYearContext, ZhPeriodDateToDateContext, ZhPeriodDateTimeToDateTimeContext, ZhPeriodDateTimeToTimeContext, ZhPeriodTimeToTimeContext, ZhPeriodMonthDayToMonthDayContext } from "../grammar/TimeParser";
+import { ZhDateDayAroundAliasContext, ZhDateDayAroundStepContext, ZhDateNormalContext, ZhDateTimeContext, ZhMonthContext, ZhMonthDayContext, ZhPeriodWeek_1Context, ZhPeriodWeek_2Context, ZhTimeNormalContext, ZhWeekDayContext, ZhYearContext, ZhPeriodDateToDateContext, ZhPeriodDateTimeToDateTimeContext, ZhPeriodDateTimeToTimeContext, ZhPeriodTimeToTimeContext, ZhPeriodMonthDayToMonthDayContext, ZhDirectTimeHourStepContext, ZhDirectTimeMinuteStepContext, ZhDateDayAroundHalfContext, ZhDirectTimeHalfHourStepContext, ZhDirectTimeHalfDayStepContext } from "../grammar/TimeParser";
 import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerUnexpectedError, AnalyzerValue, WeekValues } from "../model";
 import { StdTimeAnalyzerVisitor } from "./std";
 import { computedAroundTime, getCurrentYear, parsePeriodDateTimeToTime } from "./common.utils";
@@ -136,6 +136,8 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
 
 
   //// zhDate
+
+  /// zhDateNormal
   visitZhDateNormal(ctx: ZhDateNormalContext): AnalyzerDateValue | null {
     if (ctx.zhMonthDay()) {
       const result = this.visit(ctx.zhMonthDay()) as AnalyzerDateValue;
@@ -154,6 +156,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     throw new AnalyzerUnexpectedError();
   };
 
+  /// zhDateAround
   visitZhDateDayAroundAlias(ctx: ZhDateDayAroundAliasContext): AnalyzerDateValue {
     const date = new Date();
     date.setDate(date.getDate() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()));
@@ -170,6 +173,18 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     return AnalyzerDateValue.fromDateTime(date, ctx);
   };
 
+  visitZhDateDayAroundHalf(ctx: ZhDateDayAroundHalfContext): AnalyzerDateValue {
+    return AnalyzerDateValue.fromDateTime(
+      computedAroundTime(
+        parseZhStepAliasMark(ctx.zhStepAliasMark()),
+        { day: 15 },
+      ),
+      ctx,
+    );
+  };
+
+
+  /// zhWeekDay
 	visitZhWeekDay(ctx: ZhWeekDayContext): AnalyzerDateValue | null {
     const targetWeekDay = parseZhWeekValue(ctx.zhWeekValue());
     if (targetWeekDay === -1) {
@@ -228,6 +243,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   };
 
 	visitZhMonth(ctx: ZhMonthContext): AnalyzerDateValue | null {
+    // e.g.: 3月, 五月
     if (ctx.zhDateValue()) {
       const month = parseZhDateValue(ctx.zhDateValue());
       if (month < 1 || month > 12) {
@@ -239,15 +255,34 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
         0,
       );
     }
+
+    // e.g.: 下个月, 上上月
     if (ctx.zhAroundAliasMark()) {
       const date = new Date();
       date.setMonth(date.getMonth() + parseZhAroundAliasMark(ctx.zhAroundAliasMark()));
       return AnalyzerDateValue.fromDateTime(date);
     }
+
+    // 3个月后
     if (ctx.zhNumberValue()) {
-      const date = new Date();
-      date.setMonth(date.getMonth() + parseZhNumberValue(ctx.zhNumberValue()) * parseZhStepAliasMark(ctx.zhStepAliasMark()));
-      return AnalyzerDateValue.fromDateTime(date);
+      return AnalyzerDateValue.fromDateTime(
+        computedAroundTime(
+          parseZhStepAliasMark(ctx.zhStepAliasMark()),
+          { month: parseZhNumberValue(ctx.zhNumberValue()) },
+        ),
+        ctx,
+      );
+    }
+
+    // e.g.: 半年后
+    if (ctx.ZhHalf()) {
+      return AnalyzerDateValue.fromDateTime(
+        computedAroundTime(
+          parseZhStepAliasMark(ctx.zhStepAliasMark()),
+          { month: 6 },
+        ),
+        ctx,
+      );
     }
     throw new AnalyzerUnexpectedError();
   };
@@ -275,7 +310,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
 	visitZhTimeNormal(ctx: ZhTimeNormalContext): AnalyzerTimeValue | null {
     const values = ctx.zhNumberValue().map((item) => parseZhNumberValue(item));
     let hour = values[0];
-    const minute = values[1] || 0;
+    const minute = ctx.ZhHalf()? 30 : (values[1] || 0);
     const second = values[2] || 0;
     if (hour >= 24 || hour < 0
       || minute >= 60 || minute < 0
@@ -291,7 +326,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
   };
 
   //// zhDirectTimeAround
-  visitZhTimeHourStep(ctx: ZhTimeHourStepContext): AnalyzerValue {
+  visitZhDirectTimeHourStep(ctx: ZhDirectTimeHourStepContext): AnalyzerValue {
     const values = ctx.zhNumberValue().map((item) => parseZhNumberValue(item));
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
@@ -302,7 +337,7 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
     );
   };
 
-	visitZhTimeMinuteStep(ctx: ZhTimeMinuteStepContext): AnalyzerValue {
+	visitZhDirectTimeMinuteStep(ctx: ZhDirectTimeMinuteStepContext): AnalyzerValue {
     return AnalyzerDateTimeValue.fromDateTime(
       computedAroundTime(
         parseZhStepAliasMark(ctx.zhStepAliasMark()),
@@ -311,4 +346,24 @@ export class ZhTimeAnalyzerVisitor extends StdTimeAnalyzerVisitor {
       ctx,
     );
   };
+
+  visitZhDirectTimeHalfDayStep(ctx: ZhDirectTimeHalfDayStepContext): AnalyzerValue {
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseZhStepAliasMark(ctx.zhStepAliasMark()),
+        { hour: 12 },
+      ),
+      ctx,
+    );
+  }
+
+	visitZhDirectTimeHalfHourStep(ctx: ZhDirectTimeHalfHourStepContext): AnalyzerValue {
+    return AnalyzerDateTimeValue.fromDateTime(
+      computedAroundTime(
+        parseZhStepAliasMark(ctx.zhStepAliasMark()),
+        { minute: 30 },
+      ),
+      ctx,
+    );
+  }
 }

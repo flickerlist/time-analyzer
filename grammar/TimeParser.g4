@@ -112,14 +112,16 @@ enDateNormal
 
 enDateAround
     // e.g.: next day
-    : EnAroundWord EnDayWord                   # EnDateDayAroundAlias
+    : EnAroundWord EnDayWord                          # EnDateDayAroundAlias
     // e.g.: tomorrow
-    | EnAroundDayWord                          # EnDateDayAroundAlias_2
+    | EnAroundDayWord                                 # EnDateDayAroundAlias_2
     // e.g.: 3 days later | after 3 days
     | (
         (numberValue EnDayWord enStepAliasMark)
         | (enStepAliasMark numberValue EnDayWord)
       )  # EnDateDayAroundStep
+    // e.g.: half a month later
+    | EnHalf EnAn EnMonthWord  enStepAliasMark     # EnDateDayAroundHalfMonth
     ;
 
 enWeekDay
@@ -156,6 +158,8 @@ enMonth
         (numberValue EnMonthWord enStepAliasMark)
         | (enStepAliasMark numberValue EnMonthWord)
     )
+    // e.g.: half a year later
+    | EnHalf EnAn EnYearWord enStepAliasMark
     ;
 
 enDay
@@ -164,11 +168,14 @@ enDay
     ;
 
 enTime
+    // e.g.: 7 o'clock | seven p.m. | 7 p.m.
     : (
-        (DateNumber EnHourWholeWord (EnAfternoonWord | EnMorningWord)?)
-        | (DateNumber (EnAfternoonWord | EnMorningWord))
+        (enTimeValue EnHourWholeWord (EnAfternoonWord | EnMorningWord)?)
+        | (enTimeValue (EnAfternoonWord | EnMorningWord))
       )  # EnTimeOClock
-    | stdTime (EnAfternoonWord | EnMorningWord)?                                   # EnTimeNormal
+    | stdTime (EnAfternoonWord | EnMorningWord)?                    # EnTimeStdNormal
+    // e.g.: half past seven p.m.
+    | EnHalfPast enTimeValue (EnAfternoonWord | EnMorningWord)?     # EnTimeHalf
     ;
 
 enDirectTimeAround
@@ -176,13 +183,22 @@ enDirectTimeAround
     : (
         (enStepAliasMark numberValue EnHourWord (EnAndWord numberValue EnMinuteWord)?)
         | (numberValue EnHourWord (EnAndWord numberValue EnMinuteWord)? enStepAliasMark)
-      )  # EnTimeHourStep
+      )  # EnDirectTimeHourStep
     // e.g.: after 30 minutes | 30 minutes later
     | (
         (enStepAliasMark numberValue EnMinuteWord)
         | (numberValue EnMinuteWord enStepAliasMark)
-      )  # EnTimeMinuteStep
+      )  # EnDirectTimeMinuteStep
+    // e.g.: half a day later
+    | EnHalf EnAn EnDayWord enStepAliasMark           # EnDirectTimeHalfDayStep
+    // e.g.: half an hour later
+    | EnHalf EnAn EnHourWord enStepAliasMark     # EnDirectTimeHalfHourStep
     ;
+
+enTimeValue
+    : DateNumber
+    | EnNumberValue
+    ; 
 
 enStepAliasMark
     : EnBeforeWord
@@ -241,9 +257,11 @@ zhDateNormal
 
 zhDateAround
     // e.g.: 明天, 大后天, 前天
-    : zhAroundAliasMark (ZhTian | ZhDayWord)   # ZhDateDayAroundAlias
+    : zhAroundAliasMark (ZhTian | ZhDayWord)                    # ZhDateDayAroundAlias
     // e.g.: 3天后
-    | zhNumberValue (ZhTian | ZhDayWord) zhStepAliasMark                         # ZhDateDayAroundStep
+    | zhNumberValue (ZhTian | ZhDayWord) zhStepAliasMark        # ZhDateDayAroundStep
+    /// e.g.: 半个月后
+    | ZhHalf ZhCountMonth zhStepAliasMark                       # ZhDateDayAroundHalf
     ;
 
 zhWeekDay
@@ -273,9 +291,12 @@ zhMonth
     | zhAroundAliasMark (ZhCountMonth | ZhMonthWord)
     // e.g.: 3个月后
     | zhNumberValue ZhCountMonth zhStepAliasMark
+    // e.g.: 半年后
+    | ZhHalf ZhYearWord zhStepAliasMark
     ;
 
 zhDay
+    // e.g.: 三号 | 5号
     : zhDateValue (ZhDayWord | ZhDayWord_2)?
     ;
 
@@ -286,16 +307,23 @@ zhTime
     ;
 
 zhTimeNormal
-    //: e.g.: 上午3点20,
-    : zhTimePeriodAliasMark? zhNumberValue zhHourMark ZhHourWholeWord? (zhNumberValue zhMinuteMark? (zhNumberValue zhSecondMark?)?)?
+    //: e.g.: 上午3点20 | 上午3点半
+    : zhTimePeriodAliasMark? zhNumberValue zhHourMark ZhHourWholeWord?
+      (ZhHalf 
+      | (zhNumberValue zhMinuteMark? (zhNumberValue zhSecondMark?)?)
+      )?
     ;
 
 // time: direct means no date
 zhDirectTimeAround
     // e.g.: 三小时30分钟后
-    : zhNumberValue ZhCountHour (zhNumberValue ZhCountMinute)? zhStepAliasMark     # ZhTimeHourStep
+    : zhNumberValue ZhCountHour (zhNumberValue ZhCountMinute)? zhStepAliasMark   # ZhDirectTimeHourStep
     // e.g.: 30分钟后
-    | zhNumberValue ZhCountMinute zhStepAliasMark                                # ZhTimeMinuteStep
+    | zhNumberValue ZhCountMinute zhStepAliasMark                                # ZhDirectTimeMinuteStep
+    // e.g.: 半天后
+    | ZhHalf (ZhDayWord | ZhTian) zhStepAliasMark                                # ZhDirectTimeHalfDayStep
+    // e.g.: 半个小时后
+    | ZhHalf ZhCountHour zhStepAliasMark                                         # ZhDirectTimeHalfHourStep
     ;
 
 zhNumberValue
@@ -389,6 +417,7 @@ enUselessWords
     : EnMonthWord
     | EnWeekValue
     | EnDayValue
+    | EnNumberValue
     | EnAroundWord
     | EnAroundDayWord
     | EnBeforeWord
@@ -407,6 +436,9 @@ enUselessWords
     | EnAndWord
     | EnToWord
     | EnFrom
+    | EnHalfPast
+    | EnHalf
+    | EnAn
     ;
 
 zhUselessWords
@@ -432,4 +464,5 @@ zhUselessWords
     | ZhAfternoonWord
     | ZhOf
     | ZhFrom
+    | ZhHalf
     ;

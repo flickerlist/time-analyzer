@@ -26,6 +26,32 @@ EnWeekValue
     | S U N D A Y | S U N '.'
     ;
 EnDayValue            : [1-9][0-9]* (T H | S T | N D | R D);
+EnNumberValue
+    : Z E R O
+    | O N E
+    | T W O
+    | T H R E E
+    | F O U R
+    | F I V E
+    | S I X
+    | S E V E N
+    | E I G H T
+    | N I N E
+    | T E N
+    | E L E V E N T
+    | T W E L V E
+    | T H I R T E E N
+    | F O U R T E E N
+    | F I F T E E N
+    | S I X T E E N
+    | S E V E N T E E N
+    | E I G H T E E N
+    | N I N E T E E N
+    | T W E N T Y
+    | T W E N T Y '-' O N E
+    | T W E N T Y '-' T W O
+    | T W E N T Y '-' T H R E E
+    ;
 
 EnAroundWord          
     : O F ' ' T H E ' ' F O L L O W I N G
@@ -69,6 +95,8 @@ EnHourWholeWord
     : O F ' ' C L O C K
     | O ('’' | '\'') C L O C K
     ;
+EnHalfPast            : H A L F ' ' P A S T;
+EnHalf                : H A L F;
 
 EnAtWord
     : ((I N) | (O N) | (A T)) ' ' (T H E ' ')?
@@ -80,6 +108,7 @@ EnAtWord
 EnAndWord             : A N D;
 EnToWord              : T O;
 EnFrom                : F R O M;
+EnAn                  : A N?;
 
 //// zh (cn && tw && hk)
 fragment ZHNUMBERVALUE
@@ -103,8 +132,8 @@ ZhAroundWord
     // use for 'year, day'
     | '大前' | '大后' | '昨' | '去' | '今' | '明' | '大後'
     ;
-ZhBeforeWord          : '前';
-ZhAfterWord           : '后' | '後';
+ZhBeforeWord          : '之前' | '前';
+ZhAfterWord           : '之后' | '之後' | '后' | '後';
 
 ZhYearWord            : '年';
 ZhMonthWord           : '月';
@@ -120,6 +149,7 @@ ZhMinuteWord          : '分';
 ZhCountMinute         : '分钟' | '分鐘';
 ZhSecondWord          : '秒';
 ZhCountSecond         : '秒钟' | '秒鐘';
+ZhHalf                : '半';
 
 ZhMorningWord         : '凌晨' | '上午' | '中午' | '淩晨'; // Useless
 ZhAfternoonWord       : '下午' | '晚上';

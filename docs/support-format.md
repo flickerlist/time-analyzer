@@ -34,26 +34,31 @@
 > `before` equals to `ago`
 
 ### Date
+> Normal Date
 - March 3, 2002
 - August 21th
 - Nov. 25, 2010
 - 29th of August
 - 25th November, 2010
 
+> WeekDay
 - Mon.
 - Friday
 - next friday
 
+> Around Year
 - march 5th of the following year
 - March 5 next year
 - 3 years later on April 5
 - April 5, 3 years later
 - next March 5th
 
+> Around Month
 - Next month on the 10th
 - 10th of next month
 - 5th after 3 months
 
+> Around Day
 - tomorrow
 - the day after tomorrow
 - today
@@ -111,6 +116,13 @@
 - after 3 hours and 30 minutes
 - 3 hours before
 
+### Half
+- Half a year later
+- half a month later 
+- Half a day later
+- Half an hour later
+- at half past 8
+
 ## Chinese Time
 > Support `zh-CN`, `zh-TW`, `zh-HK`.
 
@@ -127,8 +139,11 @@
 
 > ZhDate[Year/Month/Day/Week]AroundAlias
 - 明年3月5号
+
 - 下下个月10号
+
 - 后天
+- 3天后
 
 - 周日
 - 本周五
@@ -141,7 +156,6 @@
 > ZhDate[Year/Month/Day/Week]AroundStep
 - 2年后3月5号
 - 3个月后10号
-- 3天后
 
 ### Time
 > zhTimeNormal
@@ -192,3 +206,10 @@
 - 下周五下午3点到5点
 - 下周五下午3点15到下下周日5点15分
 - 十六年后，七月一日到七月廿一日
+
+### 半
+- 半年后10号
+- 半个月后
+- 半天后
+- 半小时后
+- 下午3点半
