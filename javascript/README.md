@@ -203,6 +203,26 @@ expect(values[0]).toMatchObject({
 });
 ```
 
+## Usage in web
+1. build result of project
+```bash
+$ git clone xxx     # clone project
+$ yarn              # yarn install
+$ yarn build:umd    # build browser result
+```
+
+2. insert script to your project
+```html
+<script src="xxx">
+```
+
+3. use parser
+> All in `TimeAnalyzerLib`.
+
+```js
+TimeAnalyzerLib.parseFirst('2021年3月15号 下午3点');
+```
+
 ## Models
 > Useful models in parser.
 

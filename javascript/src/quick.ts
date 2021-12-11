@@ -1,8 +1,5 @@
-import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerValueType, TimeAnalyzer } from "time-analyzer";
-
-export enum AnalyzerQuickValueType {
-
-}
+import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerValueType } from "./model";
+import { TimeAnalyzer } from "./parser";
 
 /**
  * quick parse functions to use.
