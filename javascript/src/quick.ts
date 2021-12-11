@@ -1,4 +1,4 @@
-import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerValueType } from "./model";
+import { AnalyzerDateTimeValue, AnalyzerDateValue, AnalyzerPeriodDateTimeValue, AnalyzerPeriodDateValue, AnalyzerPeriodTimeValue, AnalyzerTimeValue, AnalyzerValue, AnalyzerValueType, MatchData } from "./model";
 import { TimeAnalyzer } from "./parser";
 
 /**
@@ -12,11 +12,7 @@ export interface AnalyzerQuickValue {
     | AnalyzerValueType.Date
     | AnalyzerValueType.Time
     | null;
-  match: null | {
-    text: string;
-    startIndex: number;
-    endIndex: number;
-  }
+  match: null | MatchData
 }
 
 export function parse(text: string): AnalyzerQuickValue[] {
