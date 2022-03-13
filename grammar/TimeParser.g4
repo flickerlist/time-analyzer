@@ -403,6 +403,7 @@ uselessWords
     : stdUselessWords
     | enUselessWords
     | zhUselessWords
+    | IGNORE_WORD
     ;
 
 stdUselessWords

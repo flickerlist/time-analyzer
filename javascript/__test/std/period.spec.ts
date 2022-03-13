@@ -35,13 +35,13 @@ describe('Standard Period', () => {
       valueType: AnalyzerValueType.PeriodDate,
       start: {
         valueType: AnalyzerValueType.Date,
-        year: 2021,
+        year: getCurrentYear(),
         month: 6,
         day: 1,
       },
       end: {
         valueType: AnalyzerValueType.Date,
-        year: 2021,
+        year: getCurrentYear(),
         month: 6,
         day: 5,
       },
@@ -60,7 +60,7 @@ describe('Standard Period', () => {
       valueType: AnalyzerValueType.PeriodDateTime,
       start: {
         valueType: AnalyzerValueType.DateTime,
-        year: 2021,
+        year: getCurrentYear(),
         month: 6,
         day: 1,
         hour: 15,
@@ -69,7 +69,7 @@ describe('Standard Period', () => {
       },
       end: {
         valueType: AnalyzerValueType.DateTime,
-        year: 2021,
+        year: getCurrentYear(),
         month: 6,
         day: 1,
         hour: 16,

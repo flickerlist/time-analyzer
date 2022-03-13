@@ -172,9 +172,9 @@ DateTimeConnectorWord : 'T';
 Comma                 : ',' | '，';
 
 //// useless words
-NEWLINE : '\r'? '\n' -> skip;
-WS      : [ \n\u000D] -> skip;
-ANY     : . -> skip;
+NEWLINE               : '\r'? '\n' -> skip;
+WS                    : [ \n\u000D] -> skip;
+IGNORE_WORD           : .; // Ignore words, don't use `skip`
 
 //// used for case-insensitive
 fragment A: [aA];
