@@ -1,7 +1,7 @@
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ZhAroundAliasMarkContext, ZhDateValueContext, ZhDayContext, ZhNumberValueContext, ZhStepAliasMarkContext, ZhYearValueContext, ZhWeekValueContext, ZhTimeContext } from "../grammar/TimeParser";
 import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekStartDay, WeekValues } from "../model";
-import   Nzh from 'nzh';
+import  Nzh from 'nzh';
 import { parseToInt } from '../utils/convert';
 import { ParserRuleContext } from 'antlr4ts';
 import { parseNumberValueContext, parseYearValue, getCurrentYear, convertWeekDay } from './common.utils';
@@ -171,7 +171,6 @@ const nzh_2 = new Nzh({
 });
 function parseZhValue(text: string): number | 0 {
   let value: number = parseInt(nzh.decode(text));
-  debugger;
   if (value > 0) {
     return value;
   }
