@@ -1,7 +1,7 @@
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { ZhAroundAliasMarkContext, ZhDateValueContext, ZhDayContext, ZhNumberValueContext, ZhStepAliasMarkContext, ZhYearValueContext, ZhWeekValueContext, ZhTimeContext } from "../grammar/TimeParser";
 import { AnalyzerDateValue, AroundValue, StepOffsetType, WeekStartDay, WeekValues } from "../model";
-import * as Nzh from 'nzh';
+import  Nzh from 'nzh';
 import { parseToInt } from '../utils/convert';
 import { ParserRuleContext } from 'antlr4ts';
 import { parseNumberValueContext, parseYearValue, getCurrentYear, convertWeekDay } from './common.utils';
@@ -153,16 +153,26 @@ export function parseZhValueWord(ctx: TerminalNode): number | null {
 const nzh = new Nzh({
   ch: "零一二三四五六七八九",
   ch_u: "个十百千万亿兆京",
+  ch_f: "负",                   // 负字符
+  ch_d: "点", 
+  "m_t":'',
+  'm_u':'',
+  "m_z":''
 });
 
 const nzh_2 = new Nzh({
   ch: "〇壹贰叁肆伍陆柒捌玖",
   ch_u: "个十百千万亿兆京",
+  ch_f: "负",                   // 负字符
+  ch_d: "点", 
+  "m_t":'',
+  'm_u':'',
+  "m_z":''
 });
 function parseZhValue(text: string): number | 0 {
-  let value: number = nzh.decode(text);
+  let value: number = parseInt(nzh.decode(text));
   if (value > 0) {
     return value;
   }
-  return nzh_2.decode(text);
+  return parseInt(nzh_2.decode(text));
 }

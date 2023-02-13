@@ -313,6 +313,7 @@ class AnalyzerPeriodTimeValue extends AbstractAnalyzerPeriodDateTimeValue<Analyz
 ```
 
 ## Development
+Please use 'npm run gen-parser' to build syntax file before development to prevent ts error. 
 
 ### Technology
 1. Use [Antlr4](https://www.antlr.org/) to parse text.  
